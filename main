@@ -69,7 +69,7 @@ async def on_message(message):
     if jackpo == 100000 and len(message.content) > 5:
         await message.channel.send(f"<@&1136310506471309383>YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO WTF IS YOUR LUCK "
                                    f"{name}\n You got JACKPO!!!!!!!!!!!!!!! "
-                                   f"\nCONGRATSSSSSSSSSS{name}! {emote}", reference=message,
+                                   f"\nCONGRATSSSSSSSSSS {name}! {emote}", reference=message,
                                    mention_author=True)
 
 
