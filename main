@@ -1,0 +1,60 @@
+import discord
+from discord.ext import commands
+from random import randint
+
+DISCORD_TOKEN = "no token for you"
+
+
+client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
+
+
+@client.event
+async def on_ready():
+    print(f'{client.user} has awoken')
+    activity = discord.Streaming(name="Ahmet Hooters", url="https://www.twitch.tv/")
+    await client.change_presence(activity=activity)
+    print("Streaming Amogus")
+
+
+@client.event
+async def on_message(message):
+    x = randint(1, 50)
+    # channel = discord.utils.get(message.guild.channels, id=1136284162832224276)
+    print(f"{message.author} te-a injurat de mama: {message.content}, #{message.channel}")
+
+    if message.author == client.user:
+        return
+
+    if str(message.channel) == "administratum":
+        x = 0
+    elif str(message.channel) == "amogus-testing":
+        x = 50
+
+    if message.author.id == 556836294710525952:
+        if message.content == "ඞ":
+            role = message.guild.get_role(1135993886926450818)
+            await message.author.add_roles(role, reason="YOO AMOGUS", atomic=True)
+            print("the")
+
+    if x == 50:
+
+        if message.author.nick:
+            name = message.author.nick
+        else:
+            name = str(message.author).title()
+        lista = [f"Haha how funny of you {name} <:keek:806077897584410685>", "Ong fr fr", "*silence*",
+                 "<:pogFrog:802088916244234261>", "Just no <:pepe_flower:901873383212462091>", "YES", "ඞ",
+                 f"{name} stinks", "Ahmet owes me $20",
+                 f"{name}, please do us all a favor and take a shower <:pepeloon:910540003828985926>"]
+        random = randint(0, (len(lista) - 1))
+        chestie = lista[random]
+        if chestie == "ඞ":
+            random_amogus = randint(0, 100)
+            chestie += chestie * random_amogus
+        await message.channel.send(chestie, reference=message, mention_author=False)
+
+    if "esketit" in message.content.lower():
+        await message.channel.send("https://tenor.com/view/lets-lets-get-it-gif-14167426", reference=message,
+                                   mention_author=False)
+
+client.run(DISCORD_TOKEN)
