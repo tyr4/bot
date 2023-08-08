@@ -29,11 +29,17 @@ async def on_ready():
     await client.change_presence(activity=activity)
     print("Streaming Amogus")
 
-
+lista = []
+temp = []
 @client.event
 async def on_message(message):
+    global lista
+    global temp
+    if str(message.author) != client.user and str(message.author) != "clyde#0000":
+        lista.append(str(message.author))
+    print(lista)
+
     x = randint(1, 50)
-    random_amogus = 0
     if str(message.author) == "clyde#0000":
         name = message.author
     elif message.author.nick:
@@ -46,7 +52,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if client.user.mentioned_in(message):
+    if "<@1135983715646976111>" in message.content.lower():
         await message.channel.send("https://cdn.discordapp.com/emojis/1078009688366522580.gif", reference=message,
                                    mention_author=True)
 
@@ -62,13 +68,16 @@ async def on_message(message):
             print("the")
 
     if x == 50:
-        lista = [f"Haha how funny of you {name} <:keek:806077897584410685>", "Ong fr fr", "*silence*",
+        funni = [f"Haha how funny of you {name} <:keek:806077897584410685>", "Ong fr fr", "*silence*",
                  "<:pogFrog:802088916244234261>", "Just no <:pepe_flower:901873383212462091>", "YES", "ඞ",
                  f"{name} stinks", "Ahmet owes me $20",
                  f"{name}, please do us all a favor and take a shower <:pepeloon:910540003828985926>"]
-        random = randint(0, (len(lista) - 1))
-        chestie = lista[random]
-        if chestie == "ඞ":
+        random = randint(0, (len(funni) - 1))
+        chestie = funni[random]
+        if chestie == f"{name} stinks" and message.author.id == 556836294710525952:
+          await message.channel.send(f"{name} smells good. <:pepeloon:910540003828985926>", reference=message,
+                                    mention_author=False)
+        elif chestie == "ඞ":
             random_amogus = randint(0, 100)
             chestie *= random_amogus
             await message.channel.send(f"{chestie}, *Amogus rolled: {random_amogus}*", reference=message, mention_author=False)
@@ -81,8 +90,20 @@ async def on_message(message):
 
     jackpot = ["J", "A", "C", "K", "P", "O", "T"]
     num = randint(1, 1000)
+    counter = 0
+    if len(lista) > 3:
+        for nume in range(len(lista)):
+            if lista[0] == lista[nume]:
+                counter += 1
+        if counter == len(lista):
+            num = 0
+        else:
+            lista = []
+
+    if str(message.channel) == "amogus-testing":
+        num = 0
     if num == 999:
-      await message.channel.send("Nice try buddy, but you rolled 999!", reference=message, mention_author=True)
+        await message.channel.send("Nice try buddy, but you rolled 999!", reference=message, mention_author=True)
     if num == 1000 and len(message.content) < 5:
         await message.channel.send(f"This would've been a winning message of the letter "
                                    f"{jackpot[randint(0, (len(jackpot) - 1))]}, but it was **{len(message.content)}** "
@@ -94,6 +115,17 @@ async def on_message(message):
                                    f"\nCongrats my friend {name}! <:pepeloon:910540003828985926>", reference=message,
                                    mention_author=True)
     jackpo = randint(1, 100000)
+    counter = 0
+    if len(lista) > 3:
+        for nume in range(len(lista)):
+            if lista[0] == lista[nume]:
+                counter += 1
+        if counter == len(lista):
+            jackpo = 0
+        else:
+            lista = []
+    if str(message.channel) == "amogus-testing":
+      jackpo = 0
     emote = "<:LETSFUCKINGGOO:901184486702710804>" * 20
     if jackpo == 100000 and len(message.content) < 5:
       await message.channel.send(f"YOOOOOOOOOO you're so unlucky {name}!!!!! This would've been a winning message for "
