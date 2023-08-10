@@ -1,23 +1,6 @@
 import discord
 from discord.ext import commands
 from random import randint
-import os
-
-from flask import Flask
-from threading import Thread
-
-app = Flask('')
-
-@app.route('/')
-def main():
-  return "Your Bot Is Ready"
-
-def run():
-  app.run(host="0.0.0.0", port=8000)
-
-def keep_alive():
-  server = Thread(target=run)
-  server.start()
 
 client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
@@ -35,9 +18,10 @@ temp = []
 async def on_message(message):
     global lista
     global temp
-    if message.author != client.user and str(message.author) != "clyde#0000":
-      if str(message.author) not in lista and len(lista) >= 2:
+    if message.author != client.user and "#0000" not in str(message.author):
+      if str(message.author) not in lista and len(lista) >= 1:
         lista = []
+        lista.append(str(message.author))
       else:
         lista.append(str(message.author))
     print(lista)
@@ -45,6 +29,7 @@ async def on_message(message):
     x = randint(1, 50)
     if str(message.author) == "clyde#0000":
         name = message.author
+        message.author.nick = False
     elif message.author.nick:
         name = message.author.nick
     else:
@@ -95,16 +80,16 @@ async def on_message(message):
     jackpot = ["J", "A", "C", "K", "P", "O", "T"]
     num = randint(1, 1000)
     counter = 0
-    if len(lista) >= 2:
+    if len(lista) >= 1:
       for nume in range(len(lista)):
           if lista[0] == lista[nume]:
               counter += 1
-          if counter == 4:
+          if counter >= 4:
               num = 0
           elif lista[0] != lista[nume]:
               lista = []
 
-    if str(message.channel) == "amogus-testing":
+    if str(message.channel) == "amogus-testing" or str(message. channel) == "letter-farming":
         num = 0
     if num == 1:
       await message.channel.send("Nice try buddy, but you rolled 1!", reference=message, mention_author=True)
@@ -122,15 +107,15 @@ async def on_message(message):
                                    mention_author=True)
     jackpo = randint(1, 100000)
     counter = 0
-    if len(lista) >= 2:
+    if len(lista) >= 0:
       for nume in range(len(lista)):
           if lista[0] == lista[nume]:
               counter += 1
-          if counter == 4:
+          if counter >= 4:
               jackpo = 0
           elif lista[0] != lista[nume]:
               lista = []
-    if str(message.channel) == "amogus-testing":
+    if str(message.channel) == "amogus-testing" or str(message. channel) == "letter-farming":
       jackpo = 0
     if jackpo >= 99990:
       await message.channel.send(f"YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO YOU ROLLED {jackpo} MY FRIEND, KEEP TRYING!", reference=message, mention_author=True)
@@ -145,9 +130,6 @@ async def on_message(message):
                                    f"\nCONGRATSSSSSSSSSS {name}! {emote}", reference=message,
                                    mention_author=True)
 
-    if "any letters" in message.content.lower():
-      await message.channel.send("No, shut up", reference=message, mention_author=True)
-
     if "the man" in message.content.lower():
       await message.channel.send("Dave the man <:LETSFUCKINGGOO:901184486702710804>", reference=message,
                                 mention_author=False)
@@ -157,4 +139,4 @@ async def on_message(message):
     print(f"{message.author} rolled {num} for letters and {jackpo} for JACKPO\n")
 
 
-client.run(f"{os.environ['tatata']}")
+client.run("")
