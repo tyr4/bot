@@ -8,14 +8,12 @@ client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 @client.event
 async def on_ready():
     print(f'{client.user} has awoken')
-    activity = discord.Streaming(name="Ahmet Hooters", url="https://www.twitch.tv/")
-    await client.change_presence(activity=activity)
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="you crying"))
     print("Streaming Amogus")
 
 
 lista = []
 temp = []
-
 
 @client.event
 async def on_message(message):
@@ -62,8 +60,9 @@ async def on_message(message):
     if x == 50:
         funni = [f"Haha how funny of you {name} <:keek:806077897584410685>", "Ong fr fr", "*silence*",
                  "<:pogFrog:802088916244234261>", "Just no <:pepe_flower:901873383212462091>", "YES", "ඞ",
-                 f"{name} stinks", "Ahmet owes me $20",
-                 f"{name}, please do us all a favor and take a shower <:pepeloon:910540003828985926>"]
+                 f"{name} stinks", "Based", "Why?", "Are you sure?", "💀", "Please don't", "Please do", "Not based",
+                 "Great idea!", "Bad idea!", "*claps*", "*throws up*", "🤝", "<a:kurukuru:1113242215083421707>",
+                 "Who asked?", "And?", "Ok buddy", f"This is why {name} shouldn't run for president"]
         random = randint(0, (len(funni) - 1))
         chestie = funni[random]
         id = [556836294710525952, 1012877247956402257, 555455936760905780]
@@ -164,5 +163,11 @@ async def on_message(message):
         print(f"{message.author} rolled {fake_num} for FAKE LETTERS and {fake_jackpo} for FAKE JACKPO\n")
     else:
         print(f"{message.author} rolled {num} for letters and {jackpo} for JACKPO\n")
-
+        
+    alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    
+    for i in range(len(alphabet)):
+        if alphabet[i] == message.content.lower():
+            await message.channel.send(alphabet[i + 1].upper(), reference=message, mention_author=False)
+        
 client.run("")
