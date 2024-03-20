@@ -43,7 +43,7 @@ levels = [
     'ii', 'ij', 'ik', 'il', 'im', 'in', 'io', 'ip', 'iq', 'ir', 'is', 'it', 'iu', 'iv', 'iw', 'ix', 'iy', 'iz', 'ja', 'jb',
     'jc', 'jd', 'je', 'jf', 'jg', 'jh', 'ji', 'jj', 'jk', 'jl', 'jm', 'jn', 'jo', 'jp', 'jq', 'jr', 'js', 'jt', 'ju', 'jv',
     'jw', 'jx', 'jy', 'jz', 'ka', 'kb', 'kc', 'kd', 'ke', 'kf', 'kg', 'kh', 'ki', 'kj', 'kk', 'kl', 'km', 'kn', 'ko', 'kp',
-    'kq', 'kjr', 'ks', 'kt', 'ku', 'kv', 'kw', 'kx', 'ky', 'kz', 'la', 'lb', 'lc', 'ld', 'le', 'lf', 'lg', 'lh', 'li', 'lj',
+    'kq', 'kr', 'ks', 'kt', 'ku', 'kv', 'kw', 'kx', 'ky', 'kz', 'la', 'lb', 'lc', 'ld', 'le', 'lf', 'lg', 'lh', 'li', 'lj',
     'lk', 'll', 'lm', 'ln', 'lo', 'lp', 'lq', 'lr', 'ls', 'lt', 'lu', 'lv', 'lw', 'lx', 'ly', 'lz', 'ma', 'mb', 'mc', 'md',
     'me', 'mf', 'mg', 'mh', 'mi', 'mj', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx',
     'my', 'mz', 'na', 'nb', 'nc', 'nd', 'ne', 'nf', 'ng', 'nh', 'ni', 'nj', 'nk', 'nl', 'nm', 'nn', 'no', 'np', 'nq', 'nr',
@@ -64,7 +64,6 @@ levels = [
     'ym', 'yn', 'yo', 'yp', 'yq', 'yr', 'ys', 'yt', 'yu', 'yv', 'yw', 'yx', 'yy', 'yz', 'za', 'zb', 'zc', 'zd', 'ze', 'zf',
     'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz'
 ]
-
 
 def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, invisible: bool):
     global start
@@ -276,8 +275,12 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
 
     print("a ok")
 
-    if min_target == 0 or min_milestone == 0:
-        return 0
+    # if min_target == 0 or min_milestone == 0:
+    #    return 0
+    if min_milestone == 0:
+        min_milestone = min_target
+        min_milestone_keys = min_target_keys
+        min_milestone_cdmg = min_target_cdmg
 
     print(f"final min {min_target}")
     print(f"final milestone {min_milestone}")
@@ -320,8 +323,8 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
     return embed
 
 
-def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_skills_new: str, invisible: bool, milestone: int = 2):
-    timeout = 60
+def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_skills_new: str, invisible: bool, include_boss_slayer: bool):
+    timeout = 30
     em_level = em_level.lower()
     elixir_per_rewind = elixir_per_rewind.lower()
     all_skills_old = all_skills_old.lower()
@@ -454,7 +457,7 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
 
     all_skills_old_int = abs(float(all_skills_old) if all_skills_old[-1].isdigit() else (float(all_skills_old[:-1]) if all_skills_old[-2].isdigit() else abs(float(all_skills_old[:-2]))))
     all_skills_new_int = abs(float(all_skills_new) if all_skills_new[-1].isdigit() else (float(all_skills_new[:-1]) if all_skills_new[-2].isdigit() else abs(float(all_skills_new[:-2]))))
-
+    print("merge?")
     while original_rewind_level >= 1000:
         original_rewind_level /= 1000
         original_rewind_suffix = levels[levels.index(original_rewind_suffix) + 1]
@@ -495,19 +498,19 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
             print("TALPA N PIEPT MERITI")
             return 0
 
-    skill_days = 2 * log((all_skills_new_int * 1000 ** (levels.index(all_skills_new_suffix) - levels.index(all_skills_old_suffix)))
-                         / all_skills_old_int * (milestone ** (round(math.log(all_skills_new_int * (1000 ** (levels.index(all_skills_new_suffix) -
-                                                                                                             levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
+    # skill_days = 2 * log((all_skills_new_int * 1000 ** (levels.index(all_skills_new_suffix) - levels.index(all_skills_old_suffix)))
+    #                      / all_skills_old_int * (milestone ** (round(math.log(all_skills_new_int * (1000 ** (levels.index(all_skills_new_suffix) -
+    #                                                                                                          levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
 
-    skill_days += log((all_skills_new_int * 1000 ** (levels.index(all_skills_new_suffix) - levels.index(all_skills_old_suffix)))
-                      / all_skills_old_int * (3 ** (round(math.log(all_skills_new_int * (1000 ** (levels.index(all_skills_new_suffix) -
-                                                                                                  levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
+    # skill_days += log((all_skills_new_int * 1000 ** (levels.index(all_skills_new_suffix) - levels.index(all_skills_old_suffix)))
+    #                   / all_skills_old_int * (3 ** (round(math.log(all_skills_new_int * (1000 ** (levels.index(all_skills_new_suffix) -
+    #                                                                                               levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
 
-    skill_days += 4 * log((all_skills_new_int * 1000 ** (levels.index(all_skills_new_suffix) - levels.index(all_skills_old_suffix)))
-                          / all_skills_old_int * (2 ** (round(math.log(all_skills_new_int * (1000 ** (levels.index(all_skills_new_suffix) -
-                                                                                                      levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
-    print(skill_days)
-
+    # skill_days += 4 * log((all_skills_new_int * 1000 ** (levels.index(all_skills_new_suffix) - levels.index(all_skills_old_suffix)))
+    #                       / all_skills_old_int * (2 ** (round(math.log(all_skills_new_int * (1000 ** (levels.index(all_skills_new_suffix) -
+    #                                                                                                   levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
+    # print(skill_days)
+    print("haha loop1")
     min_rew, min_skill, em_rewinds, em_level_int, elixir_rew_int = funni_loop(10 ** 200, skills_int, em_level_int, elixir_rew_int,
                                                                               old_multi=old_multi)
     if min_skill > 10 ** 12:
@@ -517,29 +520,37 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
     if elixir_rew_int == 0:
         print("PETRECEREA I GATA MA")
         return 0
+    print("haha loop1 ok")
 
     nice_em_level, em_level_suffix, nice_rewind_level, elixir_rew_suffix = nice_output(em_level_int, elixir_rew_int)
 
-    min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int2, em_level_int,
-                                                                                   elixir_rew_int, old_multi=1)
-
+    print("haha loop2")
+    if include_boss_slayer:
+        min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int2, em_level_int,
+                                                                                      elixir_rew_int, old_multi=1)
+    else:
+        min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int, em_level_int,
+                                                                                    elixir_rew_int, old_multi=1)
+    print("haha loop2 ok")
     nice_em_level2, em_level_suffix2, nice_rewind_level2, elixir_rew_suffix2 = nice_output(em_level_int2, elixir_rew_int2)
+
+    print("???")
 
     print(f"min rewinds {min_rew} ({min_rew2 + em_rewinds}): em {em_rewinds} ({em_rewinds2 + em_rewinds}) "
           f"skill {min_skill} ({min_skill2}) em {format(nice_em_level, '.2f')}{em_level_suffix} "
           f"({format(nice_em_level2, '.2f')}{em_level_suffix2}) "
           f"elixir {format(nice_rewind_level, '.2f')}{elixir_rew_suffix} ({format(nice_rewind_level2, '.2f')}{elixir_rew_suffix2})")
 
-    print(f"Minimum rewinds required for {format(all_skills_old_int, '.2f')}{all_skills_old_suffix} - "
-          f"{format(all_skills_new_int, '.2f')}{all_skills_new_suffix} skills (+{round(skill_days)} days)\n"
-          f"----------------------------------\n"
-          f"{format(original_em_level, '.2f')}{original_em_suffix} -> {format(nice_em_level, '.2f')}{em_level_suffix} ({format(nice_em_level2, '.2f')}{em_level_suffix2}) EM \n"
-          f"{format(original_rewind_level, '.2f')}{original_rewind_suffix} -> {format(nice_rewind_level, '.2f')}{elixir_rew_suffix} "
-          f"({format(nice_rewind_level2, '.2f')}{elixir_rew_suffix2}) Elixir\nx{nice_rewind_level / original_rewind_level} "
-          f"(x{format(em_level_int2 / original_em_multi, '.2f')}) increase----------------------------------\n"
-          f'{em_rewinds} ({em_rewinds2 + em_rewinds}) EM Rewinds\n'
-          f'{max(1, round(min_skill))} ({max(1, round(min_skill2))}) Skill Rewinds\n----------------------------------\n'
-          f'{max(1, round(em_rewinds + min_skill))} ({max(1, round(em_rewinds2 + em_rewinds + min_skill2))}) Total Rewinds')
+    # print(f"Minimum rewinds required for {format(all_skills_old_int, '.2f')}{all_skills_old_suffix} - "
+    #       f"{format(all_skills_new_int, '.2f')}{all_skills_new_suffix} skills (+{round(skill_days)} days)\n"
+    #       f"----------------------------------\n"
+    #       f"{format(original_em_level, '.2f')}{original_em_suffix} -> {format(nice_em_level, '.2f')}{em_level_suffix} ({format(nice_em_level2, '.2f')}{em_level_suffix2}) EM \n"
+    #       f"{format(original_rewind_level, '.2f')}{original_rewind_suffix} -> {format(nice_rewind_level, '.2f')}{elixir_rew_suffix} "
+    #       f"({format(nice_rewind_level2, '.2f')}{elixir_rew_suffix2}) Elixir\nx{nice_rewind_level / original_rewind_level} "
+    #       f"(x{format(em_level_int2 / original_em_multi, '.2f')}) increase----------------------------------\n"
+    #       f'{em_rewinds} ({em_rewinds2 + em_rewinds}) EM Rewinds\n'
+    #       f'{max(1, round(min_skill))} ({max(1, round(min_skill2))}) Skill Rewinds\n----------------------------------\n'
+    #       f'{max(1, round(em_rewinds + min_skill))} ({max(1, round(em_rewinds2 + em_rewinds + min_skill2))}) Total Rewinds')
 
     end = timer()
     print(f"time elapsed: {end - start} seconds")
@@ -549,7 +560,7 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
     embed.add_field(name="Do you want to make a quick adjustment? Long tap/copy the command you just used!",
                     value=f'/calc optimal_rewind em_level: {em_level} elixir_per_rewind: {elixir_per_rewind} '
                           f'all_skills_old: {all_skills_old} all_skills_new: {all_skills_new} '
-                          f'milestone: {milestone} invisible: {invisible}', inline=False)
+                          f'include_boss_slayer: {include_boss_slayer} invisible: {invisible}', inline=False)
 
     embed.add_field(
         name=f"Minimum rewinds required for {format(all_skills_old_int, '.2f')}{all_skills_old_suffix} - "
@@ -827,11 +838,16 @@ def spots(daya: int, day_range: int, tj, express):
 
 
 def daytodamage(day: int):
-    if 2000 < day <= matrice_babana[-1][0]:
-        index = matrice_babana[day // 1000]
-        day1 = index[0]
-        damage = index[1]
-        litere = index[2]
+    if 2000 <= day < 73919:
+        index = matrice_babana[day // 1000] if day <= 37000 else None
+        if index is None:
+            day1 = 37000
+            damage = 18
+            litere = "mw"
+        else:
+            day1 = index[0]
+            damage = index[1]
+            litere = index[2]
         while day1 < day:
             day1 += 1
             damage *= 1.06599999998486
@@ -839,9 +855,12 @@ def daytodamage(day: int):
                 if litere[1] != "z":
                     new_letters = letters[letters.index((litere[1])) + 1]
                     litere = litere[0] + new_letters
+                elif litere == "zz":
+                    return 0, 0
                 else:
                     litere = letters[letters.index((litere[0])) + 1] + "a"
                 damage /= 1000
+            
         return damage, litere
     else:
         return 0, 0
@@ -855,9 +874,16 @@ def damagetoday(damage: str, suffix: str):
         damage = float(damage)
     except ValueError:
         return 0
+    if len(suffix) != 2:
+        return 0
         
     ok = False
-    if len(suffix) == 2 and damage <= 1000:
+    if levels.index(suffix) > levels.index("mz"):
+        day = 37000
+        day_damage = 18
+        litera_max = "mw"
+        
+    elif len(suffix) == 2 and damage <= 1000:
         litera_max = ''
         for i in range(2, (len(matrice_babana) - 2)):
             if matrice_babana[i][2] == suffix:
@@ -904,27 +930,27 @@ def damagetoday(damage: str, suffix: str):
                         day_damage = matrice_babana[i + 2][1]
                         litera_max = matrice_babana[i + 2][2]
                         break
-
-        while litera_max != suffix:
-            day += 1
-            day_damage *= 1.06599999998486
-            if day_damage > 1000:
-                if litera_max[1] != "z":
-                    new_letters = letters[letters.index((litera_max[1])) + 1]
-                    litera_max = litera_max[0] + new_letters
-                else:
-                    litera_max = letters[letters.index((litera_max[0])) + 1] + "a"
-                day_damage /= 1000
-            if day >= 100000:
+    print(day, day_damage, litera_max)
+    while litera_max != suffix:
+        day += 1
+        day_damage *= 1.06599999998486
+        if day_damage > 1000:
+            if litera_max[1] != "z":
+                new_letters = letters[letters.index((litera_max[1])) + 1]
+                litera_max = litera_max[0] + new_letters
+            elif litera_max == "zz":
                 return 0
+            else:
+                litera_max = letters[letters.index((litera_max[0])) + 1] + "a"
+            day_damage /= 1000
+        if day >= 100000:
+            return 0
 
-        while day_damage <= damage:
-            day += 1
-            day_damage *= 1.06599999998486
+    while day_damage <= damage:
+        day += 1
+        day_damage *= 1.06599999998486
 
-        return day
-    else:
-        return 0
+    return day
 
 
 def weapondamage(old_day: int, new_day: int):
@@ -984,7 +1010,7 @@ class Formulas(commands.GroupCog, name="calc"):
         embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                          icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
         if damage == 0:
-            await interaction.response.send_message(f"Day must be between 2000 and 37000", ephemeral=True)
+            await interaction.response.send_message(f"Day must be between 2000 and 73918.", ephemeral=True)
         else:
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                 await interaction.response.send_message(embed=embed)
@@ -1014,7 +1040,7 @@ class Formulas(commands.GroupCog, name="calc"):
                          icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
         if day == 0:
             await interaction.response.send_message(f"Invalid data, please try again. Example: 123hi damage translates "
-                                                    f"to Day 21467.\nNote: This only works for damage above 9ak (Day 2000)", ephemeral=True)
+                                                    f"to Day 21467.\nNote: This only works for damage above 9ak (Day 2000).", ephemeral=True)
         else:
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                 await interaction.response.send_message(embed=embed)
@@ -1053,7 +1079,7 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(days_to_look_ahead="Days you want to look ahead the starting day, for all spots within that range")
     async def spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
         print(f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead}")
-        if 50 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= 37500 and starting_day > 50:
+        if 50 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= 38940 and starting_day > 50:
             embed = spots(starting_day, days_to_look_ahead, tj=tj, express=express)
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                 await interaction.response.send_message(embed=embed)
@@ -1064,7 +1090,7 @@ class Formulas(commands.GroupCog, name="calc"):
         else:
             await interaction.response.send_message(
                 "Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                "the mob data goes up to Day 37500.\n- Days to look ahead must "
+                "the mob data goes up to Day 38940.\n- Days to look ahead must "
                 "be greater than 50.\n- Starting day must be above 50.", ephemeral=True)
         print("Done w/ Rewind Spots")
 
@@ -1091,7 +1117,7 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(days_to_look_ahead="Days you want to look ahead the starting day, for the best spots within that range")
     async def best_spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
         print(f"Trying 'Best Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead}")
-        if 100 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= 37500 and starting_day > 50:
+        if 100 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= 38940 and starting_day > 50:
             embed = best_spot(starting_day, days_to_look_ahead, express=express, tj=tj)
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                 await interaction.response.send_message(embed=embed)
@@ -1101,7 +1127,7 @@ class Formulas(commands.GroupCog, name="calc"):
                 await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                                                    "the mob data goes up to Day 37500.\n- Days to look ahead must "
+                                                    "the mob data goes up to Day 38940.\n- Days to look ahead must "
                                                     "be greater than 100.\n- Starting day must be above 50.", ephemeral=True)
         print("Done w/ Best Spots")
 
@@ -1111,11 +1137,11 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(elixir_per_rewind="Elixir per Max Day rewind. Example: '100aq'")
     @app_commands.describe(all_skills_old="Level of your current skills/starting point for the calculations (BS included). Example: '10M'")
     @app_commands.describe(all_skills_new="Level of the desired skill levels (BS included). Example: '20M'")
-    @app_commands.describe(milestone="Only change if you are past WT to the multiplier from IN/TE nodes")
+    @app_commands.describe(include_boss_slayer="Only change if you don't want BS included in your grind.")
     async def elixirsheet_f(self, interaction: discord.Interaction, em_level: str, elixir_per_rewind: str,
-                            all_skills_old: str, all_skills_new: str, milestone: int = 2, invisible: bool = True) -> None:
+                            all_skills_old: str, all_skills_new: str, include_boss_slayer: bool = True, invisible: bool = True) -> None:
         print(f"Trying Elixir Calc with the following data: em {em_level} elixir {elixir_per_rewind} old {all_skills_old} "
-              f"new {all_skills_new} milestone {milestone}")
+              f"new {all_skills_new} bs {include_boss_slayer}")
 
         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
@@ -1127,7 +1153,7 @@ class Formulas(commands.GroupCog, name="calc"):
         print("trandafiri")
 
         embed = elixirsheet(em_level=em_level, elixir_per_rewind=elixir_per_rewind, all_skills_old=all_skills_old,
-                            all_skills_new=all_skills_new, milestone=milestone, invisible=invisible)
+                            all_skills_new=all_skills_new, include_boss_slayer=include_boss_slayer, invisible=invisible)
         print(embed)
         if embed != 0:
             print("fat frumos")
@@ -1138,7 +1164,7 @@ class Formulas(commands.GroupCog, name="calc"):
                                  "to make any adjustments!",
                             value=f'/calc optimal_rewind em_level: {em_level} elixir_per_rewind: {elixir_per_rewind} '
                                   f'all_skills_old: {all_skills_old} all_skills_new: {all_skills_new} '
-                                  f'milestone: {milestone} invisible: {invisible}'
+                                  f'include_boss_slayer: {include_boss_slayer} invisible: {invisible}'
                             , inline=False)
             embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                              icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
