@@ -69,6 +69,59 @@ levels = [
 ]
 
 
+def next_fates_milestone(seconds, mode):
+    if mode == 'easy':
+        return exped_secunda(((seconds // 7200) + 1) * 7200)[0]
+    elif mode == 'normal':
+        return exped_secunda(((seconds // 3600) + 1) * 3600)[0]
+    elif mode == 'hard':
+        return exped_secunda(((seconds // 1800) + 1) * 1800)[0]
+    elif mode == 'hell':
+        return exped_secunda(((seconds // 900) + 1) * 900)[0]
+
+
+def exped_time(daydmg: int, dayletter: str, day: int, damage: int, letter: str, multi: float):
+    seconds = 240
+    while levels.index(letter) <= levels.index(dayletter):
+        if levels.index(letter) != levels.index(dayletter):
+            damage *= multi
+            if damage > 1000:
+                letter = levels[levels.index(letter) + 1]
+                damage /= 1000
+            seconds += 1
+        elif levels.index(letter) == levels.index(dayletter):
+            if damage < daydmg:
+                damage *= multi
+                if damage > 1000:
+                    letter = levels[levels.index(letter) + 1]
+                    damage /= 1000
+                seconds += 1
+            else:
+                return seconds
+
+
+def exped_secunda(numar):
+    ceva = ""
+    if numar >= 3600:
+        if numar // 3600 < 10:
+            ceva += "0"
+        ceva += f"{numar // 3600}:"
+    else:
+        ceva += '00:'
+
+    if numar // 60 % 60 < 10:
+        ceva += '0'
+    ceva += f"{numar // 60 % 60}:"
+    if numar % 60 < 10:
+        ceva += "0"
+        ceva += f"{numar % 60}"
+    else:
+        ceva += f"{numar % 60}"
+
+    print(ceva, numar)
+    return ceva, numar
+
+
 def spot_range(day: int, tj: bool, express: bool, mode: int):
     copy = copy2 = day - 20
     upper, lower = 0, 0
@@ -720,7 +773,7 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
     start = startcopy = spot_range(daya, tj, express, 2)
     spots.append(start)
 
-    while start - startcopy <= day_range:
+    while start - startcopy < day_range:
         start = spot_range(start + 1, tj, express, 2)
         spots.append(start)
 
@@ -875,7 +928,7 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
     start = startcopy = spot_range(daya, tj, express, 2)
     spots.append(start)
 
-    while start - startcopy <= day_range:
+    while start - startcopy < day_range:
         start = spot_range(start + 1, tj, express, 2)
         spots.append(start)
 
@@ -1052,9 +1105,36 @@ def daytodamage(day: int):
                     litere = letters[letters.index((litere[0])) + 1] + "a"
                 damage /= 1000
 
-        return damage, litere
+        embed = discord.Embed(title="Day to Damage Calculator <a:kafkakurukuru:1118233531110412461>",
+                              color=0x71368a)
+        embed.add_field(name="",
+                        value=f"The approximate one-shot damage required for **Day {day1}** is **{round(damage)}{litere}**! "
+                              f"*(+/- 10 days).*",
+                        inline=False)
+
+        easy, easyseconds = exped_secunda(exped_time(damage, litere, day1, 160, 'k', 1.012874309))
+        normal, normalseconds = exped_secunda(exped_time(damage, litere, day1, 8, 'm', 1.032497215))
+        hard, hardseconds = exped_secunda(exped_time(damage, litere, day1, 1, 'b', 1.088930093))
+        hell, hellseconds = exped_secunda(exped_time(damage, litere, day1, 20, 'ae', 1.239747763))
+        nm, nmseconds = exped_secunda(int(((day1 - 1) / 10) * 3 - 201))
+
+        times = f"```Easy   {easy}    Fates MS: {next_fates_milestone(easyseconds, 'easy')}\n" \
+                f"Normal {normal}    Fates MS: {next_fates_milestone(normalseconds, 'normal')}\n" \
+                f"Hard   {hard}    Fates MS: {next_fates_milestone(hardseconds, 'hard')}\n" \
+                f"Hell   {hell}    Fates MS: {next_fates_milestone(hellseconds, 'hell')}\n" \
+                f"NM     {nm}```"
+
+        embed.add_field(name=f'Approximate Expedition Times for Day {day1}', value=times, inline=False)
+
+        embed.add_field(name="", value=f"*These calculations are using data from [IINII's Pushing Sheet]"
+                                       "(https://docs.google.com/spreadsheets/d/1-vl0Kwa9R1Bl36WHjihjItFfNVKi8LGRSEkqHy9tLuA/edit?usp=sharing)*",
+                        inline=False)
+        embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
+                         icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
+
+        return embed
     else:
-        return 0, 0
+        return 0
 
 
 def damagetoday(damage: str, suffix: str):
@@ -1142,7 +1222,34 @@ def damagetoday(damage: str, suffix: str):
         day += 1
         day_damage *= 1.06599999998486
 
-    return day
+    embed = discord.Embed(title="Damage to Day Calculator <a:kafkakurukuru:1118233531110412461>",
+                          color=0x71368a)
+    embed.add_field(name="",
+                    value=f"**{damage}{suffix.lower()}** damage will approximately put you to **Day {day}** with one-shots! "
+                          f"*(+/- 10 days).*",
+                    inline=False)
+
+    easy, easyseconds = exped_secunda(exped_time(day_damage, litera_max, day, 160, 'k', 1.012874309))
+    normal, normalseconds = exped_secunda(exped_time(day_damage, litera_max, day, 8, 'm', 1.032497215))
+    hard, hardseconds = exped_secunda(exped_time(day_damage, litera_max, day, 1, 'b', 1.088930093))
+    hell, hellseconds = exped_secunda(exped_time(day_damage, litera_max, day, 20, 'ae', 1.239747763))
+    nm, nmseconds = exped_secunda(int(((day - 1) / 10) * 3 - 201))
+
+    times = f"```Easy   {easy}    Fates MS: {next_fates_milestone(easyseconds, 'easy')}\n" \
+            f"Normal {normal}    Fates MS: {next_fates_milestone(normalseconds, 'normal')}\n" \
+            f"Hard   {hard}    Fates MS: {next_fates_milestone(hardseconds, 'hard')}\n" \
+            f"Hell   {hell}    Fates MS: {next_fates_milestone(hellseconds, 'hell')}\n" \
+            f"NM     {nm}```"
+
+    embed.add_field(name=f'Approximate Expedition Times for Day {day}', value=times, inline=False)
+
+    embed.add_field(name="", value=f"*These calculations are using data from [IINII's Pushing Sheet]"
+                                   "(https://docs.google.com/spreadsheets/d/1-vl0Kwa9R1Bl36WHjihjItFfNVKi8LGRSEkqHy9tLuA/edit?usp=sharing)*",
+                    inline=False)
+    embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
+                     icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
+
+    return embed
 
 
 def weapondamage(old_day: int, new_day: int):
@@ -1191,27 +1298,18 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(day="Day you want to receive the approximate damage for")
     async def daytodamage_f(self, interaction: discord.Interaction, day: int, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Day: {day}")
-        damage, litere = daytodamage(day)
-        embed = discord.Embed(title="Day to Damage Calculator <a:kafkakurukuru:1118233531110412461>",
-                              color=0x71368a)
-        embed.add_field(name="",
-                        value=f"The approximate one-shot damage required for **Day {day}** is **{round(damage)}{litere}**! "
-                              f"*(+/- 10 days).*",
-                        inline=False)
-        embed.add_field(name="", value=f"*These calculations are using data from [IINII's Pushing Sheet]"
-                                       "(https://docs.google.com/spreadsheets/d/1-vl0Kwa9R1Bl36WHjihjItFfNVKi8LGRSEkqHy9tLuA/edit?usp=sharing)*",
-                        inline=False)
-        embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
-                         icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
-        if damage == 0:
-            await interaction.response.send_message(f"Day must be between 2000 and 73918.", ephemeral=True)
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
+            await interaction.response.defer(ephemeral=True)
         else:
-            if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-                await interaction.response.send_message(embed=embed)
-            elif invisible is True:
-                await interaction.response.send_message(embed=embed, ephemeral=True)
-            else:
-                await interaction.response.send_message(embed=embed)
+            await interaction.response.defer()
+
+        embed = daytodamage(day)
+        if embed == 0:
+            await interaction.followup.send("Day must be between 2000 and 73918.")
+        else:
+            await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
 
     @app_commands.command(name="damagetoday", description="Input the damage number of your DPS Hero to get an estimate "
@@ -1220,28 +1318,18 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(suffix="Suffix of the damage. Example: 'aa' is the suffix for '1aa' damage")
     async def damagetoday_f(self, interaction: discord.Interaction, damage: str, suffix: str, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Damage: {damage} Suffix {suffix}")
-        day = damagetoday(damage, suffix.lower())
-        embed = discord.Embed(title="Damage to Day Calculator <a:kafkakurukuru:1118233531110412461>",
-                              color=0x71368a)
-        embed.add_field(name="",
-                        value=f"**{damage}{suffix.lower()}** damage will approximately put you to **Day {day}** with one-shots! "
-                              f"*(+/- 10 days).*",
-                        inline=False)
-        embed.add_field(name="", value=f"*These calculations are using data from [IINII's Pushing Sheet]"
-                                       f"(https://docs.google.com/spreadsheets/d/1-vl0Kwa9R1Bl36WHjihjItFfNVKi8LGRSEkqHy9tLuA/edit?usp=sharing)*",
-                        inline=False)
-        embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
-                         icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
-        if day == 0:
-            await interaction.response.send_message(f"Invalid data, please try again. Example: 123hi damage translates "
-                                                    f"to Day 21467.\nNote: This only works for damage above 9ak (Day 2000).", ephemeral=True)
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
+            await interaction.response.defer(ephemeral=True)
         else:
-            if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-                await interaction.response.send_message(embed=embed)
-            elif invisible is True:
-                await interaction.response.send_message(embed=embed, ephemeral=True)
-            else:
-                await interaction.response.send_message(embed=embed)
+            await interaction.response.defer()
+
+        embed = damagetoday(damage, suffix.lower())
+        if embed == 0:
+            await interaction.followup.send("Day must be between 2000 and 73918.")
+        else:
+            await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
 
     @app_commands.command(name="multiplier", description="Input a damage multiplier to receive a Day equivalent")
