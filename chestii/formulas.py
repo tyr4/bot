@@ -8,6 +8,12 @@ import math
 from math import log, pow
 from timeit import default_timer as timer
 
+with open("ceva.csv") as csv_file:
+    csv_reader = csv.reader(csv_file)
+    lista_csv = list(csv_reader)
+
+max_day = int(lista_csv[-1][0])
+
 matrice_babana = \
     [[0, 0, 0], [1000, 0, 0], [2000, 9, "ak"], [3000, 108, "at"], [4000, 254, "bc"], [5000, 11, "bm"],
      [6000, 19, "bv"],
@@ -26,10 +32,9 @@ boss = ["demon", "caveman", "dragon", "caveman", "skeleton", "dragon", "minotaur
 boss_scores = [0.31, 0.31, 0.41, 0.31, 0.31, 0.41, 0.31, 0.31, 0.31, 0.31, 0.31, 0.31, 0.41, 0.31, 0.41, 0.41, 0.52,
                0.41, 0.31, 0.52]
 boss_scores2 = [6, 6, 8, 6, 6, 8, 6, 6, 6, 6, 6, 6, 8, 6, 8, 8, 10,
-               8, 6, 10]
+                8, 6, 10]
 mobs = ["dino", "rex", "shade", "frosk", "blob", "gargoyle", "caps", "warmonger", "banshee"]
 mob_scores = [1.93, 1.29, 1.94, 1.00, 1.92, 1.73, 1.92, 1.33, 1.65]
-
 
 levels = [
     '', 'k', 'm', 'b', 't', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap',
@@ -65,11 +70,75 @@ levels = [
     'wy', 'wz', 'xa', 'xb', 'xc', 'xd', 'xe', 'xf', 'xg', 'xh', 'xi', 'xj', 'xk', 'xl', 'xm', 'xn', 'xo', 'xp', 'xq', 'xr',
     'xs', 'xt', 'xu', 'xv', 'xw', 'xx', 'xy', 'xz', 'ya', 'yb', 'yc', 'yd', 'ye', 'yf', 'yg', 'yh', 'yi', 'yj', 'yk', 'yl',
     'ym', 'yn', 'yo', 'yp', 'yq', 'yr', 'ys', 'yt', 'yu', 'yv', 'yw', 'yx', 'yy', 'yz', 'za', 'zb', 'zc', 'zd', 'ze', 'zf',
-    'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz'
+    'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz',
+    '{a'
 ]
 
 
-def next_fates_milestone(seconds, mode):
+def spot_score(day: int, titor: float, express: bool, tj: bool, double_rewind: bool, mode: int):
+    lista = []
+    score = 0
+    fudge = 0
+    if express:
+        portal = 10 if day // 500 == 0 else (day // 500) * 10
+    else:
+        portal = 5 if day // 500 == 0 else (day // 500) * 5
+    portal_count = 1
+    initial = day
+    if tj:
+        if double_rewind:
+            day = int(spot_round(spot_round(day * 0.75) * 0.75))
+        else:
+            day = int(spot_round(day * 0.75))
+    else:
+        if double_rewind:
+            day = int(spot_round(spot_round(day * 0.5) * 0.5))
+        else:
+            day = int(spot_round(day * 0.5))
+
+    froskScore = mob_scores[3]
+
+    while day < initial:
+        if mode == 1:
+            mobScore = mob_scores[mobs.index(lista_csv[(day // 5) - 1][1].lower())]
+        else:
+            mobScore = float(lista_csv[(day // 5) - 1][2])
+            fudge = get_fudge(initial)
+            if fudge == 0:
+                return 0
+
+        # currentDay = day if day - 10000 > 0 else 0
+
+        if mode == 1:
+            bossScore = boss_scores[day % 100 // 5]
+        else:
+            bossScore = boss_scores2[day % 100 // 5]
+
+        if express:
+            speed = -12 * (day / initial) + 13
+        else:
+            speed = -4 * (max(day / initial, 0.75)) + 5
+
+        if mode == 2:
+            speed *= titor
+        if mode == 1:
+            score += (froskScore + (mobScore - froskScore) * (1 + (max(day - 10000, 0) / 20000)) + bossScore) / speed
+        else:
+            score += ((mobScore * fudge) + bossScore) / speed
+        day += portal
+        portal_count += 1
+
+    dodo_score = score * 19.3191489361702
+    lista.append(initial)
+    lista.append(round(score, 2) if mode == 1 else round(score))
+    lista.append(boss[(day - portal) % 100 // 5].title())
+    lista.append(round(dodo_score))
+    lista.append(initial - (day - portal))
+
+    return lista
+
+
+def next_fates_milestone(seconds: int, mode: str):
     if mode == 'easy':
         return exped_secunda(((seconds // 7200) + 1) * 7200)[0]
     elif mode == 'normal':
@@ -84,11 +153,11 @@ def exped_time(daydmg: int, dayletter: str, day: int, damage: int, letter: str, 
     seconds = 240
     while levels.index(letter) <= levels.index(dayletter):
         if levels.index(letter) != levels.index(dayletter):
-            damage *= multi
+            damage *= (multi ** 10)
             if damage > 1000:
                 letter = levels[levels.index(letter) + 1]
                 damage /= 1000
-            seconds += 1
+            seconds += 10
         elif levels.index(letter) == levels.index(dayletter):
             if damage < daydmg:
                 damage *= multi
@@ -97,10 +166,22 @@ def exped_time(daydmg: int, dayletter: str, day: int, damage: int, letter: str, 
                     damage /= 1000
                 seconds += 1
             else:
-                return seconds
+                if multi == 1.012874309:
+                    return seconds + 1800
+                elif multi == 1.032497215:
+                    return seconds + 900
+                else:
+                    return seconds
+
+    if multi == 1.012874309:
+        return seconds + 1800
+    elif multi == 1.032497215:
+        return seconds + 900
+    else:
+        return seconds
 
 
-def exped_secunda(numar):
+def exped_secunda(numar: int):
     ceva = ""
     if numar >= 3600:
         if numar // 3600 < 10:
@@ -122,11 +203,11 @@ def exped_secunda(numar):
     return ceva, numar
 
 
-def spot_range(day: int, tj: bool, express: bool, mode: int):
-    copy = copy2 = day - 20
+def spot_range(day: int, tj: bool, express: bool, mode: int, double_rewind: bool):
+    copy = copy2 = day - 50
     upper, lower = 0, 0
-    for i in range(copy, day + 20):
-        if portal_compare(copy2, i, tj, express):
+    for i in range(copy, day + 50):
+        if portal_compare(copy2, i, tj, express, double_rewind):
             pass
         else:
             if i <= day:
@@ -140,7 +221,7 @@ def spot_range(day: int, tj: bool, express: bool, mode: int):
                     return upper
 
 
-def portal_compare(spot1: int, spot2: int, express: bool, tj: bool):
+def portal_compare(spot1: int, spot2: int, tj: bool, express: bool, double_rewind: bool):
     # mobs = ["dino", "rex", "shade", "frosk", "blob", "gargoyle", "caps", "warmonger", "banshee"]
     # with open("ceva.csv") as csv_file:
     #     csv_reader = csv.reader(csv_file)
@@ -152,12 +233,21 @@ def portal_compare(spot1: int, spot2: int, express: bool, tj: bool):
     else:
         portal1 = 5 if spot1 // 500 == 0 else (spot1 // 500) * 5
         portal2 = 5 if spot2 // 500 == 0 else (spot2 // 500) * 5
+
     if tj:
-        start1 = int(spot_round(spot1 * 0.75))
-        start2 = int(spot_round(spot2 * 0.75))
+        if double_rewind:
+            start1 = int(spot_round(spot_round(spot1 * 0.75) * 0.75))
+            start2 = int(spot_round(spot_round(spot2 * 0.75) * 0.75))
+        else:
+            start1 = int(spot_round(spot1 * 0.75))
+            start2 = int(spot_round(spot2 * 0.75))
     else:
-        start1 = int(spot_round(spot1 * 0.5))
-        start2 = int(spot_round(spot2 * 0.5))
+        if double_rewind:
+            start1 = int(spot_round(spot_round(spot1 * 0.5) * 0.5))
+            start2 = int(spot_round(spot_round(spot2 * 0.5) * 0.5))
+        else:
+            start1 = int(spot_round(spot1 * 0.5))
+            start2 = int(spot_round(spot2 * 0.5))
 
     while spot2 > start1:
         mob1 = start1
@@ -179,7 +269,7 @@ def portal_compare(spot1: int, spot2: int, express: bool, tj: bool):
     return 1
 
 
-def spot_round(day):
+def spot_round(day: float):
     if day % 10 == 7.5:
         return day + 2.5
     elif day % 10 == 2.5:
@@ -193,7 +283,7 @@ def spot_round(day):
     return upper if upper % 5 == 0 else lower
 
 
-def get_fudge(initial):
+def get_fudge(initial: int):
     if initial < 1000:
         return 0
     elif initial < 2000:
@@ -238,7 +328,7 @@ def get_fudge(initial):
     return fudge
 
 
-def secunda(numar):
+def secunda(numar: int):
     ceva = ""
     ceva += f"{numar // 60}:"
     if numar % 60 < 10:
@@ -766,15 +856,15 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
     return embed
 
 
-def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, titor: float):
+def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, titor: float, double_rewind: bool):
     kek = daya
     spots = []
     alta_matrice_babana = []
-    start = startcopy = spot_range(daya, tj, express, 2)
+    start = startcopy = spot_range(daya, tj, express, 2, double_rewind)
     spots.append(start)
 
     while start - startcopy < day_range:
-        start = spot_range(start + 1, tj, express, 2)
+        start = spot_range(start + 1, tj, express, 2, double_rewind)
         spots.append(start)
 
     with open("ceva.csv") as csv_file:
@@ -782,49 +872,7 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
         lista_csv = list(csv_reader)
 
         for day in spots:
-            lista = []
-            score = 0
-            dodo_score = 0
-            if express:
-                portal = 10 if day // 500 == 0 else (day // 500) * 10
-            else:
-                portal = 5 if day // 500 == 0 else (day // 500) * 5
-            portal_count = 1
-            initial = day
-            if tj:
-                day = int(spot_round(day * 0.75))
-            else:
-                day = int(spot_round(day * 0.5))
-            froskScore = mob_scores[3]
-
-            while day < initial:
-                if mode == 1:
-                    mobScore = mob_scores[mobs.index(lista_csv[(day // 5) - 1][1].lower())]
-                else:
-                    mobScore = float(lista_csv[(day // 5) - 1][2])
-                    fudge = get_fudge(initial)
-                currentDay = day if day - 10000 > 0 else 0
-                if mode == 1:
-                    bossScore = boss_scores[day % 100 // 5]
-                else:
-                    bossScore = boss_scores2[day % 100 // 5]
-                if express:
-                    speed = -12 * (day / initial) + 13
-                else:
-                    speed = -4 * (max(day / initial, 0.75)) + 5
-                speed *= titor if mode == 2 else 1
-                if mode == 1:
-                    score += (froskScore + (mobScore - froskScore) * (1 + (max(day - 10000, 0) / 20000)) + bossScore) / speed
-                else:
-                    score += ((mobScore * fudge) + bossScore) / speed
-                day += portal
-                portal_count += 1
-
-            dodo_score += score * 19.3191489361702
-            lista.append(initial)
-            lista.append(score)
-            lista.append(dodo_score)
-            lista.append(initial - (day - portal))
+            lista = spot_score(day=day, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=mode)
             alta_matrice_babana.append(lista)
 
     def minim():
@@ -837,9 +885,9 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
             if minim_fishy > alta_matrice_babana[i][1]:
                 minim_fishy = alta_matrice_babana[i][1]
                 index_fishy = i
-                minim_dodo = alta_matrice_babana[i][2]
+                minim_dodo = alta_matrice_babana[i][3]
                 day_minim = alta_matrice_babana[i][0]
-                skip = alta_matrice_babana[i][3]
+                skip = alta_matrice_babana[i][4]
 
         return index_fishy, minim_fishy, minim_dodo, day_minim, skip
 
@@ -852,166 +900,125 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
 
     embed = discord.Embed(title="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
     if mode == 1:
-        embed.add_field(name='', value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1)}__ ({skip} Days last portal) has the best rewind score of __{format(minim_fishy, '.2f')}__ "
-                                   f"({round(minim_dodo)}) for the next "
-                                   f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1)}__ ({skip2} Days last portal) with a score of __{format(minim_fishy2, '.2f')}__"
-                                   f" ({round(minimdodo2)}) and __{spot_range(day3, tj, express, 1)}__ ({skip3} Days last portal) with a score of __{format(minim_fishy3, '.2f')}__ ({round(minimdodo3)}). "
-                                   f"The score inside brackets represents [Dodora's Rewind Sheet](https://bit.ly/Dodo_Rewind_Sheet) Cost.**", inline=False)
+        embed.add_field(name='', value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ ({skip} Days last portal) has the best rewind score of __{format(minim_fishy, '.2f')}__ "
+                                       f"({round(minim_dodo)}) for the next "
+                                       f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1, double_rewind)}__ ({skip2} Days last portal) with a score of __{format(minim_fishy2, '.2f')}__"
+                                       f" ({round(minimdodo2)}) and __{spot_range(day3, tj, express, 1, double_rewind)}__ ({skip3} Days last portal) with a score of __{format(minim_fishy3, '.2f')}__ ({round(minimdodo3)}). "
+                                       f"The score inside brackets represents [Dodora's Rewind Sheet](https://bit.ly/Dodo_Rewind_Sheet) Cost.**", inline=False)
     else:
-        embed.add_field(name='', value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1)}__ ({skip} Days last portal) has the best rewind time of __{secunda(int(minim_fishy))}__ for the next "
-                                       f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1)}__ ({skip2} Days last portal) with a time of __{secunda(int(minim_fishy2))}__"
-                                       f" and __{spot_range(day3, tj, express, 1)}__ ({skip3} Days last portal) with a time of __{secunda(int(minim_fishy3))}__.**\n\n***__Note: These times are approximations"
+        embed.add_field(name='', value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ ({skip} Days last portal) has the best rewind time of __{secunda(int(minim_fishy))}__ for the next "
+                                       f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1, double_rewind)}__ ({skip2} Days last portal) with a time of __{secunda(int(minim_fishy2))}__"
+                                       f" and __{spot_range(day3, tj, express, 1, double_rewind)}__ ({skip3} Days last portal) with a time of __{secunda(int(minim_fishy3))}__.**\n\n***__Note: These times are approximations"
                                        f" and may not be 100% accurate.__***", inline=False)
 
     embed.add_field(name='', value="*These calculations are using data from [Fishy's Rewind Sheet]"
-                                   "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor options, look at the optional parameters.*")
+                                   "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor/Double rewind options, look at the optional parameters.*")
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
 
     return embed
 
 
-def detailed_spot(daya: int, express: bool, tj: bool):
-    with open("ceva.csv") as csv_file:
-        csv_reader = csv.reader(csv_file)
-        lista_csv = list(csv_reader)
-        embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
-        embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
-                             "------------", value='', inline=False)
-        if express:
-            portal = 10 if daya // 500 == 0 else (daya // 500) * 10
+def detailed_spot(daya: int, express: bool, tj: bool, double_rewind: bool, titor: float):
+    embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
+    embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
+                            "------------", value='', inline=False)
+    score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=1)
+    score_fishy = score_fishy_list[1]
+    score_dodo = score_fishy_list[3]
+    if daya > 1000:
+        score_seconds = secunda(spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
+        embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
+    else:
+        embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
+    if express:
+        portal = 10 if daya // 500 == 0 else (daya // 500) * 10
+    else:
+        portal = 5 if daya // 500 == 0 else (daya // 500) * 5
+    portal_count = 1
+    initial = daya
+    if tj:
+        if double_rewind:
+            daya = int(spot_round(spot_round(daya * 0.75) * 0.75))
         else:
-            portal = 5 if daya // 500 == 0 else (daya // 500) * 5
-        portal_count = 1
-        initial = daya
-        if tj:
             daya = int(spot_round(daya * 0.75))
+    else:
+        if double_rewind:
+            daya = int(spot_round(spot_round(daya * 0.5) * 0.5))
         else:
             daya = int(spot_round(daya * 0.5))
-        i = 0
-        if daya % 5 != 0:
-            return 0
-        ceva = "```\n"
-        while daya < initial:
-            if i <= 13:
-                if i < 9:
-                    ceva += f"{portal_count}:  " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                      f"{boss[daya % 100 // 5].title()}\n"
-                else:
-                    ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                     f"{boss[daya % 100 // 5].title()}\n"
-                i += 1
-            elif i == 14:
-                ceva += "\n```"
-                i = 0
-                embed.add_field(name='', value=ceva, inline=False)
-                ceva = "```\n"
-                ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                 f"{boss[daya % 100 // 5].title()}\n"
-            daya += portal
-            portal_count += 1
+    i = 0
+    if daya % 5 != 0:
+        return 0
+    ceva = "```\n"
+    while daya < initial:
+        if i < 9:
+            ceva += f"{portal_count}:  " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+                                                                                                f"{boss[daya % 100 // 5].title()}\n"
+        else:
+            ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+                                                                                                f"{boss[daya % 100 // 5].title()}\n"
+        if i % 14 == 0 and i >= 14:
+            ceva += "\n```"
+            embed.add_field(name='', value=ceva, inline=False)
+            ceva = "```\n"
+            ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+                                                                                                f"{boss[daya % 100 // 5].title()}\n"
+        daya += portal
+        portal_count += 1
+        i += 1
 
     ceva += "\n```"
     embed.add_field(name='', value=ceva, inline=False)
     embed.add_field(name='', value="*These calculations are using data from [Fishy's Rewind Sheet]"
-                                   "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express options, look at the optional parameters.*")
+                                   "(https://bit.ly/Fishy_Rewind_Sheet). The scores inside brackets represent [Dodora's Rewind Sheet]" \
+                                   f"(https://bit.ly/Dodo_Rewind_Sheet) Costs. If you want to use No TJ/No Express/Titor/Double Rewind options, look at the optional parameters.*")
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
     return embed
 
 
-def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: float):
+def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: float, double_rewind: bool):
     kek = daya
     spots = []
     matrice = []
+    lista = []
     skip = 0
-    start = startcopy = spot_range(daya, tj, express, 2)
+    start = startcopy = spot_range(daya, tj, express, 2, double_rewind)
     spots.append(start)
 
     while start - startcopy < day_range:
-        start = spot_range(start + 1, tj, express, 2)
+        start = spot_range(start + 1, tj, express, 2, double_rewind)
         spots.append(start)
 
-    with open("ceva.csv") as csv_file:
-        csv_reader = csv.reader(csv_file)
-        lista_csv = list(csv_reader)
-        minim_fishy = 10000
-        day_minim = 0
-        if mode == 1:
-            embed = discord.Embed(title="DAY --- SCORE --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
-        else:
-            embed = discord.Embed(title="DAY --- TIME --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
-        embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
-                             "------------", value='', inline=False)
-        for day in spots:
-            lista = []
-            score = 0
-            dodo_score = 0
-            if express:
-                portal = 10 if day // 500 == 0 else (day // 500) * 10
-            else:
-                portal = 5 if day // 500 == 0 else (day // 500) * 5
-            portal_count = 1
-            initial = day
-            if tj:
-                day = int(spot_round(day * 0.75))
-            else:
-                day = int(spot_round(day * 0.5))
-            froskScore = mob_scores[3]
-
-            while day < initial:
-                if mode == 1:
-                    mobScore = mob_scores[mobs.index(lista_csv[(day // 5) - 1][1].lower())]
-                else:
-                    mobScore = float(lista_csv[(day // 5) - 1][2])
-                    fudge = get_fudge(initial)
-                    if fudge == 0:
-                        return 0
-
-                # currentDay = day if day - 10000 > 0 else 0
-
-                if mode == 1:
-                    bossScore = boss_scores[day % 100 // 5]
-                else:
-                    bossScore = boss_scores2[day % 100 // 5]
-
-                if express:
-                    speed = -12 * (day / initial) + 13
-                else:
-                    speed = -4 * (max(day / initial, 0.75)) + 5
-
-                if mode == 2:
-                    speed *= titor
-                if mode == 1:
-                    score += (froskScore + (mobScore - froskScore) * (1 + (max(day - 10000, 0) / 20000)) + bossScore) / speed
-                else:
-                    score += ((mobScore * fudge) + bossScore) / speed
-                day += portal
-                portal_count += 1
-
-            dodo_score += score * 19.3191489361702
-            if minim_fishy > score:
-                day_minim = initial
-                minim_fishy = score
-                minim_dodo = dodo_score
-                skip = initial - (day - portal)
-
-            dodo_score = round(dodo_score)
-            lista.append(initial)
-            lista.append(score)
-            lista.append(boss[(day - portal) % 100 // 5].title())
-            lista.append(dodo_score)
-            lista.append(initial - (day - portal))
-            matrice.append(lista)
+    minim_fishy, minim_dodo = 100000000, 100000000
+    day_minim = 0
+    if mode == 1:
+        embed = discord.Embed(title="DAY --- SCORE --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
+    else:
+        embed = discord.Embed(title="DAY --- TIME --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
+    embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
+                         "------------", value='', inline=False)
+    for day in spots:
+        lista = spot_score(day=day, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=mode)
+        initial = lista[0]
+        score = lista[1]
+        dodo_score = round(lista[3])
+        if minim_fishy > score:
+            day_minim = initial
+            minim_fishy = score
+            minim_dodo = dodo_score
+            skip = lista[4]
+        matrice.append(lista)
 
     print(matrice)
     if mode == 1:
-        value = f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1)}__ has the best rewind score of {format(minim_fishy, '.2f')} " \
-           f"({round(minim_dodo)}) with a {skip} Day last portal skip for the next " \
-           f"{day_range} days. The scores inside brackets represent [Dodora's Rewind Sheet]" \
-           f"(https://bit.ly/Dodo_Rewind_Sheet) Costs.**"
+        value = f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ has the best rewind score of {format(minim_fishy, '.2f')} " \
+                f"({round(minim_dodo)}) with a {skip} Day last portal skip for the next " \
+                f"{day_range} days. The scores inside brackets represent [Dodora's Rewind Sheet]" \
+                f"(https://bit.ly/Dodo_Rewind_Sheet) Costs.**"
     else:
-        value = f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1)}__ has the best time of __{secunda(int(minim_fishy))}__ with a " \
+        value = f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ has the best time of __{secunda(int(minim_fishy))}__ with a " \
                 f"{skip} day last portal skip for the next " \
                 f"{day_range} days.**"
     embed.add_field(name='', value=value, inline=False)
@@ -1022,15 +1029,15 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
     min_day = 0
     prev = 0
     for lista in matrice:
-        spots = spot_range(lista[0], tj, express, 1)
+        spots = spot_range(lista[0], tj, express, 1, double_rewind)
         if prev == spots:
             pass
         else:
             if counter < 10:
                 if mode == 1:
-                    ceva += f"{spot_range(lista[0], tj, express, 1)}" + " - " + f"{format(lista[1], '.2f')}" + f" ({lista[3]})" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
+                    ceva += f"{spot_range(lista[0], tj, express, 1, double_rewind)}" + " - " + f"{format(lista[1], '.2f')}" + f" ({lista[3]})" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
                 else:
-                    ceva += f"{spot_range(lista[0], tj, express, 1)}" + " - " + f"{secunda(int(lista[1]))}" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
+                    ceva += f"{spot_range(lista[0], tj, express, 1, double_rewind)}" + " - " + f"{secunda(int(lista[1]))}" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
                 counter += 1
                 if min_fishy > lista[1]:
                     min_day = lista[0]
@@ -1041,10 +1048,10 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
                 counter = 0
                 if mode == 1:
                     embed.add_field(name='-------------------------------------------\n'
-                                     f"The best spot within this range is {spot_range(min_day, tj, express, 1)} with a {format(min_fishy, '.2f')} ({min_dodo}) score", value=ceva, inline=False)
+                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {format(min_fishy, '.2f')} ({min_dodo}) score", value=ceva, inline=False)
                 else:
                     embed.add_field(name='-------------------------------------------\n'
-                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1)} with a {secunda(int(min_fishy))} time", value=ceva, inline=False)
+                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {secunda(int(min_fishy))} time", value=ceva, inline=False)
                 ceva = '```\n'
                 min_fishy = 1000000000
                 if min_fishy > lista[1]:
@@ -1052,9 +1059,9 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
                     min_fishy = lista[1]
                     min_dodo = lista[3]
                 if mode == 1:
-                    ceva += f"{spot_range(lista[0], tj, express, 1)}" + " - " + f"{format(lista[1], '.2f')}" + f" ({lista[3]})" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
+                    ceva += f"{spot_range(lista[0], tj, express, 1, double_rewind)}" + " - " + f"{format(lista[1], '.2f')}" + f" ({lista[3]})" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
                 else:
-                    ceva += f"{spot_range(lista[0], tj, express, 1)}" + " - " + f"{secunda(int(lista[1]))}" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
+                    ceva += f"{spot_range(lista[0], tj, express, 1, double_rewind)}" + " - " + f"{secunda(int(lista[1]))}" + " - " + f"{lista[2]} ({lista[4]} skip)\n"
         prev = spots
 
     ceva += "\n```"
@@ -1065,16 +1072,16 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
 
     if mode == 1:
         embed.add_field(name='-------------------------------------------\n'
-                         f"The best spot within this range is {spot_range(min_day, tj, express, 1)} with a {format(min_fishy, '.2f')} ({min_dodo}) score",
+                             f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {format(min_fishy, '.2f')} ({min_dodo}) score",
                         value=ceva, inline=False)
         embed.add_field(name='', value="*These calculations are using data from [Fishy's Rewind Sheet]"
-                    "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor options, look at the optional parameters.*")
+                                       "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor/Double Rewind options, look at the optional parameters.*")
     else:
         embed.add_field(name='-------------------------------------------\n'
-                             f"The best spot within this range is {spot_range(min_day, tj, express, 1)} with a {secunda(int(min_fishy))} time",
+                             f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {secunda(int(min_fishy))} time",
                         value=ceva, inline=False)
         embed.add_field(name='', value="***__Note: These times are approximations and may not be 100% accurate.__***\n*These calculations are using data from [Fishy's Rewind Sheet]"
-                                    "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor options, look at the optional parameters.*")
+                                       "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor/Double Rewind options, look at the optional parameters.*")
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
 
@@ -1145,8 +1152,10 @@ def damagetoday(damage: str, suffix: str):
     try:
         damage = float(damage)
     except ValueError:
+        print("valoare eroare")
         return 0
     if len(suffix) != 2:
+        print("len")
         return 0
 
     ok = False
@@ -1160,6 +1169,7 @@ def damagetoday(damage: str, suffix: str):
         for i in range(2, (len(matrice_babana) - 2)):
             if matrice_babana[i][2] == suffix:
                 if damage < 9 and suffix == "ak":
+                    print("2k")
                     return 0
                 elif damage < matrice_babana[i][1]:
                     day = matrice_babana[i - 1][0]
@@ -1203,6 +1213,12 @@ def damagetoday(damage: str, suffix: str):
                         litera_max = matrice_babana[i + 2][2]
                         break
 
+                    else:
+                        day = matrice_babana[i - 1][0]
+                        day_damage = matrice_babana[i - 1][1]
+                        litera_max = matrice_babana[i - 1][2]
+
+    print(litera_max, suffix, day, day_damage)
     while litera_max != suffix:
         day += 1
         day_damage *= 1.06599999998486
@@ -1211,11 +1227,13 @@ def damagetoday(damage: str, suffix: str):
                 new_letters = letters[letters.index((litera_max[1])) + 1]
                 litera_max = litera_max[0] + new_letters
             elif litera_max == "zz":
+                print('zz fraiere')
                 return 0
             else:
                 litera_max = letters[letters.index((litera_max[0])) + 1] + "a"
             day_damage /= 1000
         if day >= 100000:
+            print('100k fraiere')
             return 0
 
     while day_damage <= damage:
@@ -1362,34 +1380,38 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.choices(mode=[
         discord.app_commands.Choice(name='Rewind scores', value=1),
         discord.app_commands.Choice(name='Seconds approximation (+/- 10s)', value=2)],
-    titor=[
-        discord.app_commands.Choice(name='No Titor', value=1.0),
-        discord.app_commands.Choice(name='4*', value=1.08),
-        discord.app_commands.Choice(name='7*', value=1.1),
-        discord.app_commands.Choice(name='10*', value=1.14),
-        discord.app_commands.Choice(name='13*', value=1.16),
-        discord.app_commands.Choice(name='15*', value=1.2)],
+        titor=[
+            discord.app_commands.Choice(name='No Titor', value=1.0),
+            discord.app_commands.Choice(name='4*', value=1.08),
+            discord.app_commands.Choice(name='7*', value=1.1),
+            discord.app_commands.Choice(name='10*', value=1.14),
+            discord.app_commands.Choice(name='13*', value=1.16),
+            discord.app_commands.Choice(name='15*', value=1.2)],
     )
     async def spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, mode: discord.app_commands.Choice[int],
-                      titor: discord.app_commands.Choice[float] = 1.0, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
-        print(f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel {titor}")
+                      titor: discord.app_commands.Choice[float] = 1.0, invisible: bool = True, tj: bool = True, express: bool = True, double_rewind: bool = False) -> None:
+        print(f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel {titor} double {double_rewind}")
         try:
             titor = titor.value
         except:
             titor = 1.0
-        if 50 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= 42500 and starting_day >= 50:
-            embed = spots(starting_day, days_to_look_ahead, tj=tj, express=express, mode=mode.value, titor=titor)
-
-            if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-                await interaction.response.send_message(embed=embed)
-            elif invisible is True:
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+        if 50 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
+            if double_rewind is True and starting_day < 10585:
+                await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
+                return
             else:
-                await interaction.response.send_message(embed=embed)
+                embed = spots(starting_day, days_to_look_ahead, tj=tj, express=express, mode=mode.value, titor=titor, double_rewind=double_rewind)
+                if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+                    await interaction.response.send_message(embed=embed)
+                elif invisible is True:
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=embed)
+
         else:
             await interaction.response.send_message(
                 "Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                "the mob data goes up to Day 42500.\n- Days to look ahead must "
+                f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
                 "be greater than 50.\n- Starting day must be above 50.\nSecond approximations not available below Day 1000."
                 , ephemeral=True)
         print("Done w/ Rewind Spots")
@@ -1397,9 +1419,30 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.command(name="detailed_rewindspot", description="Input a day to receive detailed info on the spot ("
                                                                   "each Mob and Boss for each portal)")
     @app_commands.describe(day="Day of the Rewind spot you want the details for")
-    async def detailed_spots_f(self, interaction: discord.Interaction, day: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
-        print(f"Trying 'Detailed Spot' with the following data: Day: {day}")
-        embed = detailed_spot(day, tj=tj, express=express)
+    @app_commands.choices(titor=[
+        discord.app_commands.Choice(name='No Titor', value=1.0),
+        discord.app_commands.Choice(name='4*', value=1.08),
+        discord.app_commands.Choice(name='7*', value=1.1),
+        discord.app_commands.Choice(name='10*', value=1.14),
+        discord.app_commands.Choice(name='13*', value=1.16),
+        discord.app_commands.Choice(name='15*', value=1.2)],
+    )
+    async def detailed_spots_f(self, interaction: discord.Interaction, day: int, invisible: bool = True, tj: bool = True, express: bool = True,
+                               double_rewind: bool = False, titor: discord.app_commands.Choice[float] = 1.0) -> None:
+        print(f"Trying 'Detailed Spot' with the following data: Day: {day} titel {titor} double {double_rewind} tj {tj} express {express}")
+        try:
+            titor = titor.value
+        except:
+            titor = 1.0
+
+        if double_rewind is True and day < 10585:
+            await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
+            return
+        else:
+            # if day <= max_day:
+                embed = detailed_spot(day, express=express, tj=tj, double_rewind=double_rewind, titor=titor)
+            # else:
+            #     embed = 0
         if embed == 0:
             await interaction.response.send_message("Invalid spot/data, please try again.", ephemeral=True)
         else:
@@ -1418,33 +1461,44 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.choices(mode=[
         discord.app_commands.Choice(name='Rewind scores', value=1),
         discord.app_commands.Choice(name='Seconds approximation (+/- 10s)', value=2)],
-    titor=[
-        discord.app_commands.Choice(name='No Titor', value=1.0),
-        discord.app_commands.Choice(name='4*', value=1.08),
-        discord.app_commands.Choice(name='7*', value=1.1),
-        discord.app_commands.Choice(name='10*', value=1.14),
-        discord.app_commands.Choice(name='13*', value=1.16),
-        discord.app_commands.Choice(name='15*', value=1.2)],
+        titor=[
+            discord.app_commands.Choice(name='No Titor', value=1.0),
+            discord.app_commands.Choice(name='4*', value=1.08),
+            discord.app_commands.Choice(name='7*', value=1.1),
+            discord.app_commands.Choice(name='10*', value=1.14),
+            discord.app_commands.Choice(name='13*', value=1.16),
+            discord.app_commands.Choice(name='15*', value=1.2)],
     )
     async def best_spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, mode: discord.app_commands.Choice[int],
                            titor: discord.app_commands.Choice[float] = 1.0, invisible: bool = True,
-                           tj: bool = True, express: bool = True) -> None:
+                           tj: bool = True, express: bool = True, double_rewind: bool = False) -> None:
         print(f"Trying 'Best Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel {titor}")
-        if 100 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= 42500 and starting_day >= 50:
+        if 100 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
             try:
                 titor = titor.value
             except:
                 titor = 1.0
-            embed = best_spot(starting_day, days_to_look_ahead, express=express, tj=tj, mode=mode.value, titor=titor)
-            if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-                await interaction.response.send_message(embed=embed)
-            elif invisible is True:
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+            if double_rewind is True and starting_day < 10585:
+                await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
+                return
             else:
-                await interaction.response.send_message(embed=embed)
+                if mode.value == 2 and starting_day < 1000:
+                    await interaction.response.send_message(
+                        "Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
+                        f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
+                        "be greater than 50.\n- Starting day must be above 50.\nSecond approximations not available below Day 1000."
+                        , ephemeral=True)
+                else:
+                    embed = best_spot(starting_day, days_to_look_ahead, express=express, tj=tj, mode=mode.value, titor=titor, double_rewind=double_rewind)
+                    if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+                        await interaction.response.send_message(embed=embed)
+                    elif invisible is True:
+                        await interaction.response.send_message(embed=embed, ephemeral=True)
+                    else:
+                        await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                                                    "the mob data goes up to Day 42500.\n- Days to look ahead must "
+                                                    f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
                                                     "be greater than 100.\n- Starting day must be above 50.\nSecond approximations "
                                                     "not available below Day 1000.", ephemeral=True)
         print("Done w/ Best Spots")
