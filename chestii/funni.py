@@ -39,105 +39,14 @@ class Funni(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def jail(self, ctx):
-        global jailtime
-        # if ctx.author.id == 399022430699520006:
-        #     await ctx.reply("Caca nu e voie!", mention_author = False)
-        if jailtime:
-            jailtime = False
-            await ctx.reply("Deactivated jailtime!", mention_author=False)
-        else:
-            jailtime = True
-            await ctx.reply("Activated jailtime!", mention_author=False)
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def list(self, ctx):
-        le_copie = ""
-        for user_id in ceva_id:
-            le_copie += f"<@{user_id}>\n"
-        if le_copie == "":
-            await ctx.reply("Jail empty idiot", mention_author=False)
-        else:
-            await ctx.reply(le_copie, mention_author=False)
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def jailadd(self, ctx, user_id: int):
-        if user_id in [556836294710525952, 970592525230407680]:
-            await ctx.reply("You don't have something better to do?", mention_author=False)
-        elif user_id not in ceva_id:
-            ceva_id.append(user_id)
-            await ctx.reply(f"Added `{user_id}` to the jail list! <:PeepoNote:802224247098572810>", mention_author=False)
-        else:
-            await ctx.reply("It's already in there you dummmy", mention_author=False)
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def jailremove(self, ctx, user_id: int):
-        if user_id in ceva_id:
-            ceva_id.remove(user_id)
-            await ctx.reply(f"Removed `{user_id}` from the jail list!", mention_author=False)
-        else:
-            await ctx.reply("It's not in there you dummy", mention_author=False)
-
-    @commands.command()
-    async def status(self, ctx):
-        if jailtime:
-            await ctx.reply("Jail is currently **enabled**!", mention_author=False)
-        else:
-            await ctx.reply("Jail is currently **disabled**!", mention_author=False)
-
-    @commands.command()
     async def ask(self, ctx):
+        if ctx.guild.id == 570929677732937738 and ctx.author.id != 556836294710525952:
+            return
         idk = randint(1, 2)
         if idk == 1:
-            await ctx.reply("<a:yescat:1230595803739848776>", mention_author=False)
+            await ctx.reply("<a:yescat:1279088548162572319>", mention_author=False)
         else:
-            await ctx.reply("<a:nonono:1232066820958064740>", mention_author=False)
-
-    # @commands.command()
-    # @commands.has_permissions(administrator=True)
-    # async def history(self, ctx, cana: int):
-    #     print(cana)
-    #     data = datetime.datetime(2023, 12, 25, tzinfo=pytz.utc)
-    #     print(data)
-    #     channel = self.bot.get_channel(cana)
-    #     print(channel)
-    #     counter = 0
-    #     start = time.time()
-    #     async for message in channel.history(limit=None, after=data):
-    #         counter += 1
-    #         if message.reactions:
-    #             for reaction in message.reactions:
-    #                 if str(reaction.emoji) == "<a:kurukuru:1113242215083421707>" and reaction.me is True:
-    #                     update(str(message.author), 1)
-    #                 elif str(reaction.emoji) == "<a:kurukuru2:1139252590278889529>" and reaction.me is True:
-    #                     update(str(message.author), 2)
-    #         if message.author == self.bot.user and str(message.content) == "<a:kurukuru:1113242215083421707>":
-    #             # print("WOW EXISTA KURUKURU EMOTE")
-    #             replied_message = message.reference.resolved if message.reference else None
-    #             try:
-    #                 update(str(replied_message.author), 3)
-    #             except:
-    #                 pass
-    #         if message.author == self.bot.user and str(message.content) == "https://tenor.com/view/kuru-kuru-gif-10882574602170874277":
-    #             # print("WOW EXISTA KURUKURU GIF")
-    #             replied_message = message.reference.resolved if message.reference else None
-    #             try:
-    #                 update(str(replied_message.author), 4)
-    #             except:
-    #                 pass
-    #     end = time.time()
-    #     await ctx.reply(f"{counter} messages found in <#{cana}> in {format(end - start, '.2f')}s!")
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def angel(self, ctx, *, arg):
-        print(arg)
-        await ctx.message.delete()
-        await ctx.channel.send(arg)
+            await ctx.reply("<a:NoNoNoNoNo:1279088570350571673>", mention_author=False)
 
     @commands.Cog.listener()
     async def on_message(self, message):
