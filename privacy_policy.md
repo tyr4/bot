@@ -13,7 +13,9 @@ Silwuf only interacts with users through Discord's slash commands to provide cal
 - **Message Reaction Leaderboard** - In the official DBG server, users have a chance to get emote reactions on any message. Silwuf keeps track of the user's ID, display name and updates the counter. 
 
 ## 3. Data Retention  
-Since Silwuf does not collect or store any data, there is no data retention policy. All interactions happen in real-time, and no personal data is saved.
+I retain user data (User ID, Display Name, Avatar Image) for as long as it is necessary to provide the bot's functionality. Specifically:
+- **User Data** (User ID, Display Name): This information is stored for as long as the user interacts with the bot. If a user stops interacting with the bot, they can contact me to erase the data.
+- **Avatar Image**: This image is stored until the next user uses the same command which requires your Avatar Image (2), after which it updates itself.
 
 ## 4. Data Sharing  
 I do not share any data with third parties, as no personal data is collected or stored.
