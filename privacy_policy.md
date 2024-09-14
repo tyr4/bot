@@ -9,7 +9,8 @@ This Privacy Policy describes how Silwuf ("I", "me", or "my") collects, uses, an
 Silwuf only interacts with users through Discord's slash commands to provide calculator and help functions. I do not collect, store, or process personal data, nor do I share any information with third parties.
 
 - **User Commands:** The bot processes commands entered by users (e.g., calculator inputs or help requests). These commands are processed in real-time and are not stored.
-- **Discord IDs:** To operate within Discord, the bot may momentarily access user IDs to execute commands but does not store this data.
+- **Discord IDs:** To operate within Discord, the bot may momentarily access user IDs to execute commands.
+- **Message Reaction Leaderboard** - In the official DBG server, users have a chance to get emote reactions on any message. Silwuf keeps track of the user's ID, display name and updates the counter. 
 
 ## 3. Data Retention  
 Since Silwuf does not collect or store any data, there is no data retention policy. All interactions happen in real-time, and no personal data is saved.
