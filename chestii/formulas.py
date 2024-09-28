@@ -70,8 +70,7 @@ levels = [
     'wy', 'wz', 'xa', 'xb', 'xc', 'xd', 'xe', 'xf', 'xg', 'xh', 'xi', 'xj', 'xk', 'xl', 'xm', 'xn', 'xo', 'xp', 'xq', 'xr',
     'xs', 'xt', 'xu', 'xv', 'xw', 'xx', 'xy', 'xz', 'ya', 'yb', 'yc', 'yd', 'ye', 'yf', 'yg', 'yh', 'yi', 'yj', 'yk', 'yl',
     'ym', 'yn', 'yo', 'yp', 'yq', 'yr', 'ys', 'yt', 'yu', 'yv', 'yw', 'yx', 'yy', 'yz', 'za', 'zb', 'zc', 'zd', 'ze', 'zf',
-    'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz',
-    '{a'
+    'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz'
 ]
 
 
@@ -920,53 +919,56 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
 
 
 def detailed_spot(daya: int, express: bool, tj: bool, double_rewind: bool, titor: float):
-    embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
-    embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
-                            "------------", value='', inline=False)
-    score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=1)
-    score_fishy = score_fishy_list[1]
-    score_dodo = score_fishy_list[3]
-    if daya > 1000:
-        score_seconds = secunda(spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
-        embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
-    else:
-        embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
-    if express:
-        portal = 10 if daya // 500 == 0 else (daya // 500) * 10
-    else:
-        portal = 5 if daya // 500 == 0 else (daya // 500) * 5
-    portal_count = 1
-    initial = daya
-    if tj:
-        if double_rewind:
-            daya = int(spot_round(spot_round(daya * 0.75) * 0.75))
+    with open("ceva.csv") as csv_file:
+        csv_reader = csv.reader(csv_file)
+        lista_csv = list(csv_reader)
+        embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
+        embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
+                             "------------", value='', inline=False)
+        score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=1)
+        score_fishy = score_fishy_list[1]
+        score_dodo = score_fishy_list[3]
+        if daya > 1000:
+            score_seconds = secunda(spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
+            embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
         else:
-            daya = int(spot_round(daya * 0.75))
-    else:
-        if double_rewind:
-            daya = int(spot_round(spot_round(daya * 0.5) * 0.5))
+            embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
+        if express:
+            portal = 10 if daya // 500 == 0 else (daya // 500) * 10
         else:
-            daya = int(spot_round(daya * 0.5))
-    i = 0
-    if daya % 5 != 0:
-        return 0
-    ceva = "```\n"
-    while daya < initial:
-        if i < 9:
-            ceva += f"{portal_count}:  " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                f"{boss[daya % 100 // 5].title()}\n"
+            portal = 5 if daya // 500 == 0 else (daya // 500) * 5
+        portal_count = 1
+        initial = daya
+        if tj:
+            if double_rewind:
+                daya = int(spot_round(spot_round(daya * 0.75) * 0.75))
+            else:
+                daya = int(spot_round(daya * 0.75))
         else:
-            ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                f"{boss[daya % 100 // 5].title()}\n"
-        if i % 14 == 0 and i >= 14:
-            ceva += "\n```"
-            embed.add_field(name='', value=ceva, inline=False)
-            ceva = "```\n"
-            ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                f"{boss[daya % 100 // 5].title()}\n"
-        daya += portal
-        portal_count += 1
-        i += 1
+            if double_rewind:
+                daya = int(spot_round(spot_round(daya * 0.5) * 0.5))
+            else:
+                daya = int(spot_round(daya * 0.5))
+        i = 0
+        if daya % 5 != 0:
+            return 0
+        ceva = "```\n"
+        while daya < initial:
+            if i < 9:
+                ceva += f"{portal_count}:  " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+                                                                                                  f"{boss[daya % 100 // 5].title()}\n"
+            else:
+                ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+                                                                                                 f"{boss[daya % 100 // 5].title()}\n"
+            if i % 14 == 0 and i >= 14:
+                ceva += "\n```"
+                embed.add_field(name='', value=ceva, inline=False)
+                ceva = "```\n"
+                ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+                                                                                                 f"{boss[daya % 100 // 5].title()}\n"
+            daya += portal
+            portal_count += 1
+            i += 1
 
     ceva += "\n```"
     embed.add_field(name='', value=ceva, inline=False)
@@ -1219,22 +1221,25 @@ def damagetoday(damage: str, suffix: str):
                         litera_max = matrice_babana[i - 1][2]
 
     print(litera_max, suffix, day, day_damage)
-    while litera_max != suffix:
-        day += 1
-        day_damage *= 1.06599999998486
-        if day_damage > 1000:
-            if litera_max[1] != "z":
-                new_letters = letters[letters.index((litera_max[1])) + 1]
-                litera_max = litera_max[0] + new_letters
-            elif litera_max == "zz":
-                print('zz fraiere')
+    try:
+        while litera_max != suffix:
+            day += 1
+            day_damage *= 1.06599999998486
+            if day_damage > 1000:
+                if litera_max[1] != "z":
+                    new_letters = letters[letters.index((litera_max[1])) + 1]
+                    litera_max = litera_max[0] + new_letters
+                elif litera_max == "zz":
+                    print('zz fraiere')
+                    return 0
+                else:
+                    litera_max = letters[letters.index((litera_max[0])) + 1] + "a"
+                day_damage /= 1000
+            if day > 73918:
+                print('73k fraiere')
                 return 0
-            else:
-                litera_max = letters[letters.index((litera_max[0])) + 1] + "a"
-            day_damage /= 1000
-        if day >= 100000:
-            print('100k fraiere')
-            return 0
+    except:
+        return 0
 
     while day_damage <= damage:
         day += 1
@@ -1247,11 +1252,14 @@ def damagetoday(damage: str, suffix: str):
                           f"*(+/- 10 days).*",
                     inline=False)
 
-    easy, easyseconds = exped_secunda(exped_time(day_damage, litera_max, day, 160, 'k', 1.012874309))
-    normal, normalseconds = exped_secunda(exped_time(day_damage, litera_max, day, 8, 'm', 1.032497215))
-    hard, hardseconds = exped_secunda(exped_time(day_damage, litera_max, day, 1, 'b', 1.088930093))
-    hell, hellseconds = exped_secunda(exped_time(day_damage, litera_max, day, 20, 'ae', 1.239747763))
-    nm, nmseconds = exped_secunda(int(((day - 1) / 10) * 3 - 201))
+    try:
+        easy, easyseconds = exped_secunda(exped_time(day_damage, litera_max, day, 160, 'k', 1.012874309))
+        normal, normalseconds = exped_secunda(exped_time(day_damage, litera_max, day, 8, 'm', 1.032497215))
+        hard, hardseconds = exped_secunda(exped_time(day_damage, litera_max, day, 1, 'b', 1.088930093))
+        hell, hellseconds = exped_secunda(exped_time(day_damage, litera_max, day, 20, 'ae', 1.239747763))
+        nm, nmseconds = exped_secunda(int(((day - 1) / 10) * 3 - 201))
+    except IndexError:
+        return 0
 
     times = f"```Easy   {easy}    Fates MS: {next_fates_milestone(easyseconds, 'easy')}\n" \
             f"Normal {normal}    Fates MS: {next_fates_milestone(normalseconds, 'normal')}\n" \
@@ -1316,6 +1324,8 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(day="Day you want to receive the approximate damage for")
     async def daytodamage_f(self, interaction: discord.Interaction, day: int, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Day: {day}")
+        if 2000 > day > 73918:
+            await interaction.response.defer(ephemeral=True)
         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
         elif invisible is True:
@@ -1325,7 +1335,7 @@ class Formulas(commands.GroupCog, name="calc"):
 
         embed = daytodamage(day)
         if embed == 0:
-            await interaction.followup.send("Day must be between 2000 and 73918.")
+            await interaction.followup.send("Day must be between 2000 (9ak damage) and 73918 (999zz damage).")
         else:
             await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
@@ -1336,7 +1346,9 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(suffix="Suffix of the damage. Example: 'aa' is the suffix for '1aa' damage")
     async def damagetoday_f(self, interaction: discord.Interaction, damage: str, suffix: str, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Damage: {damage} Suffix {suffix}")
-        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+        if (float(damage) < 9 and levels.index(suffix) < levels.index("ak")) or (float(damage) > 999 and suffix.lower() == "zz"):
+            await interaction.response.defer(ephemeral=True)
+        elif interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
         elif invisible is True:
             await interaction.response.defer(ephemeral=True)
@@ -1345,7 +1357,7 @@ class Formulas(commands.GroupCog, name="calc"):
 
         embed = damagetoday(damage, suffix.lower())
         if embed == 0:
-            await interaction.followup.send("Day must be between 2000 and 73918.")
+            await interaction.followup.send("Day must be between 2000 (9ak damage) and 73918 (999zz damage).")
         else:
             await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
