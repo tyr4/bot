@@ -1146,7 +1146,7 @@ def daytodamage(day: int):
         return 0
 
 
-def damagetoday(damage: str, suffix: str):
+def damagetoday(damage: str, suffix: str, test_mode: bool):
     day_damage = 0
     day = 0
     litera_max = ''
@@ -1220,6 +1220,10 @@ def damagetoday(damage: str, suffix: str):
                         day_damage = matrice_babana[i - 1][1]
                         litera_max = matrice_babana[i - 1][2]
 
+    if test_mode:
+        if levels.index(suffix) < levels.index("ak"):
+            if damage < 9:
+                return 0
     print(litera_max, suffix, day, day_damage)
     try:
         while litera_max != suffix:
@@ -1324,9 +1328,9 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(day="Day you want to receive the approximate damage for")
     async def daytodamage_f(self, interaction: discord.Interaction, day: int, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Day: {day}")
-        if 2000 > day > 73918:
+        if day < 2000 or day > 73918:
             await interaction.response.defer(ephemeral=True)
-        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+        elif interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
         elif invisible is True:
             await interaction.response.defer(ephemeral=True)
@@ -1346,7 +1350,8 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(suffix="Suffix of the damage. Example: 'aa' is the suffix for '1aa' damage")
     async def damagetoday_f(self, interaction: discord.Interaction, damage: str, suffix: str, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Damage: {damage} Suffix {suffix}")
-        if (float(damage) < 9 and levels.index(suffix) < levels.index("ak")) or (float(damage) > 999 and suffix.lower() == "zz"):
+        test_value = damagetoday(damage, suffix.lower(), True)
+        if test_value == 0:
             await interaction.response.defer(ephemeral=True)
         elif interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
@@ -1355,7 +1360,7 @@ class Formulas(commands.GroupCog, name="calc"):
         else:
             await interaction.response.defer()
 
-        embed = damagetoday(damage, suffix.lower())
+        embed = damagetoday(damage, suffix.lower(), False)
         if embed == 0:
             await interaction.followup.send("Day must be between 2000 (9ak damage) and 73918 (999zz damage).")
         else:
