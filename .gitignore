@@ -5,4 +5,5 @@ frames/
 *.png
 *.gif
 *.csv
+image.*
 test*.*
