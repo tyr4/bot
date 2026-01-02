@@ -2,6 +2,7 @@
 pet_frames/
 gear big/
 frames/
+chestii/__pycache__/
 *.json
 *.png
 *.gif
