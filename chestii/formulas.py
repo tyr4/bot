@@ -8,6 +8,8 @@ import math
 from math import log, pow
 from timeit import default_timer as timer
 
+from chestii.wrapped import update_wrapped_data
+
 with open("ceva.csv") as csv_file:
     csv_reader = csv.reader(csv_file)
     lista_csv = list(csv_reader)
@@ -415,7 +417,7 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
             if sn(p, cdmg_int, x) == prev:
                 break
             prev = sn(p, cdmg_int, x)
-            if sn(p, cdmg_int, 0) > gold_int:
+            if sn(p, cdmg_int, x) > gold_int:
                 p -= 10 ** (num_length - 1)
                 if num_length > 1:
                     num_length -= 1
@@ -1126,18 +1128,13 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
 
 def daytodamage(day: int):
     if 2000 <= day < 73919:
-        index = matrice_babana[day // 1000] if day <= 37000 else None
-        if index is None:
-            day1 = 37000
-            damage = 18
-            litere = "mw"
-        else:
-            day1 = index[0]
-            damage = index[1]
-            litere = index[2]
+        index = matrice_babana[2]
+        day1 = index[0]
+        damage = index[1]
+        litere = index[2]
         while day1 < day:
             day1 += 1
-            damage *= 1.06599999998486
+            damage *= 1.066
             if damage > 1000:
                 if litere[1] != "z":
                     new_letters = letters[letters.index((litere[1])) + 1]
@@ -1195,64 +1192,10 @@ def damagetoday(damage: str, suffix: str, test_mode: bool):
         return 0
 
     ok = False
-    if levels.index(suffix) > levels.index("mz"):
-        day = 37000
-        day_damage = 18
-        litera_max = "mw"
 
-    elif len(suffix) == 2 and damage <= 1000:
-        litera_max = ''
-        for i in range(2, (len(matrice_babana) - 2)):
-            if matrice_babana[i][2] == suffix:
-                if damage < 9 and suffix == "ak":
-                    print("2k")
-                    return 0
-                elif damage < matrice_babana[i][1]:
-                    day = matrice_babana[i - 1][0]
-                    day_damage = matrice_babana[i - 1][1]
-                    litera_max = matrice_babana[i - 1][2]
-                    ok = True
-                    break
-        if ok is False:
-            for i in range(2, (len(matrice_babana) - 2)):
-                if matrice_babana[i][2][0] == suffix[0]:
-                    if letters.index(matrice_babana[i][2][1]) <= letters.index(suffix[1]) < \
-                            letters.index(matrice_babana[i + 1][2][1]):
-                        day = matrice_babana[i][0]
-                        day_damage = matrice_babana[i][1]
-                        litera_max = matrice_babana[i][2]
-                        break
-
-                    elif letters.index(suffix[1]) < letters.index(matrice_babana[i][2][1]):
-                        day = matrice_babana[i - 1][0]
-                        day_damage = matrice_babana[i - 1][1]
-                        litera_max = matrice_babana[i - 1][2]
-                        break
-
-                    elif letters.index(matrice_babana[i + 2][2][0]) - letters.index(matrice_babana[i + 1][2][0]) == 1:
-                        day = matrice_babana[i + 1][0]
-                        day_damage = matrice_babana[i + 1][1]
-                        litera_max = matrice_babana[i + 1][2]
-                        break
-
-                    elif letters.index(matrice_babana[i + 1][2][1]) < letters.index(suffix[1]) < \
-                            letters.index(matrice_babana[i + 2][2][1]):
-                        day = matrice_babana[i + 1][0]
-                        day_damage = matrice_babana[i + 1][1]
-                        litera_max = matrice_babana[i + 1][2]
-                        break
-
-                    elif letters.index(matrice_babana[i][2][1]) < letters.index(matrice_babana[i + 1][2][1]) < \
-                            letters.index(suffix[1]):
-                        day = matrice_babana[i + 2][0]
-                        day_damage = matrice_babana[i + 2][1]
-                        litera_max = matrice_babana[i + 2][2]
-                        break
-
-                    else:
-                        day = matrice_babana[i - 1][0]
-                        day_damage = matrice_babana[i - 1][1]
-                        litera_max = matrice_babana[i - 1][2]
+    day = matrice_babana[2][0]
+    day_damage = matrice_babana[2][1]
+    litera_max = matrice_babana[2][2]
 
     if test_mode:
         if levels.index(suffix) < levels.index("ak"):
@@ -1262,7 +1205,7 @@ def damagetoday(damage: str, suffix: str, test_mode: bool):
     try:
         while litera_max != suffix:
             day += 1
-            day_damage *= 1.06599999998486
+            day_damage *= 1.066
             if day_damage > 1000:
                 if litera_max[1] != "z":
                     new_letters = letters[letters.index((litera_max[1])) + 1]
@@ -1281,7 +1224,7 @@ def damagetoday(damage: str, suffix: str, test_mode: bool):
 
     while day_damage <= damage:
         day += 1
-        day_damage *= 1.06599999998486
+        day_damage *= 1.066
 
     embed = discord.Embed(title="Damage to Day Calculator <a:kafkakurukuru:1118233531110412461>",
                           color=0x71368a)
@@ -1357,6 +1300,8 @@ class Formulas(commands.GroupCog, name="calc"):
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Weapon Damage")
 
+        update_wrapped_data("weapon_damage", old_day, new_day, invisible, username=interaction.user.name, user_id=interaction.user.id)
+
     @app_commands.command(name="daytodamage", description="Input a Day to receive the estimate one-shot damage "
                                                           "required to beat it")
     @app_commands.describe(day="Day you want to receive the approximate damage for")
@@ -1377,6 +1322,9 @@ class Formulas(commands.GroupCog, name="calc"):
         else:
             await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
+
+        update_wrapped_data("day_to_damage", day, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="damagetoday", description="Input the damage number of your DPS Hero to get an estimate "
                                                           "of your one-shot pushing range")
@@ -1401,6 +1349,9 @@ class Formulas(commands.GroupCog, name="calc"):
             await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
 
+        update_wrapped_data("damage_to_day", damage, suffix, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
+
     @app_commands.command(name="multiplier", description="Input a damage multiplier to receive a Day equivalent")
     @app_commands.describe(multiplier="Multiplier value of the number you want to calculate. Example: A x50 multiplier is worth 62 days")
     async def multiplier(self, interaction: discord.Interaction, multiplier: int, invisible: bool = True) -> None:
@@ -1412,8 +1363,8 @@ class Formulas(commands.GroupCog, name="calc"):
 
             embed = discord.Embed(title="Multiplier to Day Calculator <a:kafkakurukuru:1118233531110412461>",
                                   color=0x71368a)
-            embed.add_field(name='', value=f"A **x{multiplier}** Damage multiplier is worth **{round(math.log(multiplier, 2) * 11)}** Days! *This is also equal to "
-                                           f"**{round(math.log(multiplier * multiplier, 2) * 11)}** Days for Crit Damage.*", inline=False)
+            embed.add_field(name='', value=f"A **x{multiplier}** Damage multiplier is worth **{round(math.log(multiplier, 1.066))}** Days! *This is also equal to "
+                                           f"**{round(math.log(multiplier * multiplier, 1.066))}** Days for Crit Damage.*", inline=False)
             embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                              icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
@@ -1423,6 +1374,9 @@ class Formulas(commands.GroupCog, name="calc"):
             else:
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Multiplier")
+
+        update_wrapped_data("multiplier", multiplier, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="rewindspots", description="Input a day & the days to look ahead to receive the Rewind "
                                                           "Scores for the said spots. Max 500.")
@@ -1451,6 +1405,9 @@ class Formulas(commands.GroupCog, name="calc"):
                 , ephemeral=True)
         print("Done w/ Rewind Spots")
 
+        update_wrapped_data("rewind_spots", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
+
     @app_commands.command(name="detailed_rewindspot", description="Input a day to receive detailed info on the spot ("
                                                                   "each Mob and Boss for each portal)")
     @app_commands.describe(day="Day of the Rewind spot you want the details for")
@@ -1475,6 +1432,9 @@ class Formulas(commands.GroupCog, name="calc"):
             else:
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Detailed Spot")
+
+        update_wrapped_data("detailed_rewindspot", day, tj, express, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="best_rewindspot", description="Input a day & the days to look ahead to receive the day with the "
                                                               "best Rewind Score")
@@ -1501,6 +1461,9 @@ class Formulas(commands.GroupCog, name="calc"):
                                                     "be greater than 100.\n- Starting day must be above 50.\nSecond approximations "
                                                     "not available below Day 1000.", ephemeral=True)
         print("Done w/ Best Spots")
+
+        update_wrapped_data("best_rewindspot", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="optimal_rewind",
                           description="Input your elixir data to receive the minimum amount of rewinds for your goal")
@@ -1543,75 +1506,78 @@ class Formulas(commands.GroupCog, name="calc"):
 
         print("Done w/ Elixir calc")
 
-    @app_commands.command(name="dungeon_gold",
-                          description="Input your dungeon data to receive the best way to spend your keys")
-    @app_commands.describe(crit_dmg_stat_level="Stat Menu -> Crit DMG Stat info button -> Blue number. NOT the percentage value, but the level")
-    @app_commands.describe(gold_stat_level="Stat Menu -> Gold Stat info button -> Blue number. NOT the percentage value, but the level")
-    @app_commands.describe(gold_from_dungeon_keys="Shop -> Dungeon -> Gold you get from your current keys. Example: '12bm'")
-    @app_commands.describe(current_keys="Shop -> Dungeon -> Keys you currently have. Example: '12M'")
-    @app_commands.describe(days_you_want_to_progress="The amount of days you'd like to expect from upgrading Crit DMG with Dungeon gold. Example: '70'")
-    async def gold_sheet_f(self, interaction: discord.Interaction, crit_dmg_stat_level: str, gold_stat_level: str, gold_from_dungeon_keys: str, current_keys: str, days_you_want_to_progress: int, invisible: bool = True) -> None:
-        print(f"Trying Gold Sheet with the following data: cdmg {crit_dmg_stat_level} gold {gold_from_dungeon_keys} keys {current_keys} target {days_you_want_to_progress}"
-              f"gold lvl {gold_stat_level}")
-        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-            await interaction.response.defer()
-        elif invisible is True:
-            await interaction.response.defer(ephemeral=True)
-        else:
-            await interaction.response.defer()
-        if days_you_want_to_progress > 300:
-            embed = 0
-        else:
-            embed = gold_sheet(cdmg=crit_dmg_stat_level, gold=gold_from_dungeon_keys, gold_level=gold_stat_level, keys=current_keys, target=days_you_want_to_progress, invisible=invisible)
-        if embed == 0:
-            embed = discord.Embed(title="", color=0x71368a)
-            embed.add_field(name=f"Invalid data or days target exceeded 300, please try again. Long tap/copy the command you just used if you want "
-                                 "to make any adjustments!",
-                            value=f"/calc dungeon_gold crit_dmg_stat_level: {crit_dmg_stat_level} gold_stat_level: {gold_stat_level} gold_from_dungeon_keys: {gold_from_dungeon_keys} "
-                                  f"current_keys: {current_keys} days_you_want_to_progress: {days_you_want_to_progress} invisible: {invisible}")
-            embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
-                             icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
-            await interaction.followup.send(embed=embed, ephemeral=True)
-        else:
-            if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-                await interaction.followup.send(embed=embed)
-            elif invisible is True:
-                await interaction.followup.send(embed=embed, ephemeral=True)
-            else:
-                await interaction.followup.send(embed=embed)
-        print("Done w/ Gold Sheet")
-        
-    @app_commands.command(name="tot_tickets", description="Input the initial tickets you get from ToT to get the total amount you can get from all 20")
-    @app_commands.describe(initial="Tickets you get from the first BC level of the day")
-    @app_commands.choices(desired_hero_star=[
-        discord.app_commands.Choice(name='20*', value=20),
-        discord.app_commands.Choice(name='19*', value=19),
-        discord.app_commands.Choice(name='18*', value=18),
-        discord.app_commands.Choice(name='17*', value=17),
-        discord.app_commands.Choice(name='16*', value=16),
-        discord.app_commands.Choice(name='15*', value=15),
-        discord.app_commands.Choice(name='14*', value=14),
-        discord.app_commands.Choice(name='13*', value=13),
-        discord.app_commands.Choice(name='12*', value=12),
-        discord.app_commands.Choice(name='11*', value=11),
-        discord.app_commands.Choice(name='10*', value=10)
-        ])
-    async def tot_tickets_f(self, interaction: discord.Interaction, initial: int, desired_hero_star: discord.app_commands.Choice[int] = 15, invisible: bool = True) -> None:
-        print(f"Trying 'ToT' with the following data: initial {initial} star {desired_hero_star}")
-        try:
-            star = desired_hero_star.value
-        except AttributeError:
-            star = desired_hero_star
+        update_wrapped_data("optimal_rewind", em_level, elixir_per_rewind, all_skills_old, all_skills_new, include_boss_slayer, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
-        embed = tot_tickets(initial=initial, star=star)
-
-        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-            await interaction.response.send_message(embed=embed)
-        elif invisible is True:
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-        else:
-            await interaction.response.send_message(embed=embed)
-        print("Done w/ ToT")
+    # @app_commands.command(name="dungeon_gold",
+    #                       description="Input your dungeon data to receive the best way to spend your keys")
+    # @app_commands.describe(crit_dmg_stat_level="Stat Menu -> Crit DMG Stat info button -> Blue number. NOT the percentage value, but the level")
+    # @app_commands.describe(gold_stat_level="Stat Menu -> Gold Stat info button -> Blue number. NOT the percentage value, but the level")
+    # @app_commands.describe(gold_from_dungeon_keys="Shop -> Dungeon -> Gold you get from your current keys. Example: '12bm'")
+    # @app_commands.describe(current_keys="Shop -> Dungeon -> Keys you currently have. Example: '12M'")
+    # @app_commands.describe(days_you_want_to_progress="The amount of days you'd like to expect from upgrading Crit DMG with Dungeon gold. Example: '70'")
+    # async def gold_sheet_f(self, interaction: discord.Interaction, crit_dmg_stat_level: str, gold_stat_level: str, gold_from_dungeon_keys: str, current_keys: str, days_you_want_to_progress: int, invisible: bool = True) -> None:
+    #     print(f"Trying Gold Sheet with the following data: cdmg {crit_dmg_stat_level} gold {gold_from_dungeon_keys} keys {current_keys} target {days_you_want_to_progress}"
+    #           f"gold lvl {gold_stat_level}")
+    #     if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+    #         await interaction.response.defer()
+    #     elif invisible is True:
+    #         await interaction.response.defer(ephemeral=True)
+    #     else:
+    #         await interaction.response.defer()
+    #     if days_you_want_to_progress > 300:
+    #         embed = 0
+    #     else:
+    #         embed = gold_sheet(cdmg=crit_dmg_stat_level, gold=gold_from_dungeon_keys, gold_level=gold_stat_level, keys=current_keys, target=days_you_want_to_progress, invisible=invisible)
+    #     if embed == 0:
+    #         embed = discord.Embed(title="", color=0x71368a)
+    #         embed.add_field(name=f"Invalid data or days target exceeded 300, please try again. Long tap/copy the command you just used if you want "
+    #                              "to make any adjustments!",
+    #                         value=f"/calc dungeon_gold crit_dmg_stat_level: {crit_dmg_stat_level} gold_stat_level: {gold_stat_level} gold_from_dungeon_keys: {gold_from_dungeon_keys} "
+    #                               f"current_keys: {current_keys} days_you_want_to_progress: {days_you_want_to_progress} invisible: {invisible}")
+    #         embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
+    #                          icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
+    #         await interaction.followup.send(embed=embed, ephemeral=True)
+    #     else:
+    #         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+    #             await interaction.followup.send(embed=embed)
+    #         elif invisible is True:
+    #             await interaction.followup.send(embed=embed, ephemeral=True)
+    #         else:
+    #             await interaction.followup.send(embed=embed)
+    #     print("Done w/ Gold Sheet")
+    #
+    # @app_commands.command(name="tot_tickets", description="Input the initial tickets you get from ToT to get the total amount you can get from all 20")
+    # @app_commands.describe(initial="Tickets you get from the first BC level of the day")
+    # @app_commands.choices(desired_hero_star=[
+    #     discord.app_commands.Choice(name='20*', value=20),
+    #     discord.app_commands.Choice(name='19*', value=19),
+    #     discord.app_commands.Choice(name='18*', value=18),
+    #     discord.app_commands.Choice(name='17*', value=17),
+    #     discord.app_commands.Choice(name='16*', value=16),
+    #     discord.app_commands.Choice(name='15*', value=15),
+    #     discord.app_commands.Choice(name='14*', value=14),
+    #     discord.app_commands.Choice(name='13*', value=13),
+    #     discord.app_commands.Choice(name='12*', value=12),
+    #     discord.app_commands.Choice(name='11*', value=11),
+    #     discord.app_commands.Choice(name='10*', value=10)
+    #     ])
+    # async def tot_tickets_f(self, interaction: discord.Interaction, initial: int, desired_hero_star: discord.app_commands.Choice[int] = 15, invisible: bool = True) -> None:
+    #     print(f"Trying 'ToT' with the following data: initial {initial} star {desired_hero_star}")
+    #     try:
+    #         star = desired_hero_star.value
+    #     except AttributeError:
+    #         star = desired_hero_star
+    #
+    #     embed = tot_tickets(initial=initial, star=star)
+    #
+    #     if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+    #         await interaction.response.send_message(embed=embed)
+    #     elif invisible is True:
+    #         await interaction.response.send_message(embed=embed, ephemeral=True)
+    #     else:
+    #         await interaction.response.send_message(embed=embed)
+    #     print("Done w/ ToT")
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Formulas(bot))

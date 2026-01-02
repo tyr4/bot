@@ -1,3 +1,6 @@
+import datetime
+import pytz
+
 import discord
 import random
 from discord.ext import commands
@@ -7,21 +10,35 @@ from PIL import Image, ImageSequence
 from io import BytesIO
 import asyncio
 import json
+import re
+import os
+import gspread
+from google.oauth2.service_account import Credentials
+import csv
+
 
 cooldown = False
 leaderboard_spots = [":first_place:", ":second_place:", ":third_place:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"]
 
+def init_sheet():
+    # Path to your service account key file
+    SERVICE_ACCOUNT_FILE = 'google_sheets_api_key.json'
 
-async def cd():
-    global counter
-    global cooldown
+    # Define the scope
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
-    counter = 0
-    for i in range(1, 31):
-        counter = i
-        await asyncio.sleep(1)
+    # Authenticate using the service account key
+    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
-    cooldown = False
+    # Use gspread to access the Google Sheets API
+    gc = gspread.authorize(creds)
+
+    # Open the Google Sheet by its title or URL
+    sheet = gc.open_by_key("1v52n_je0xtmGRkokTA-oYEPd-0FGmDazVddayyKEv7Y")
+    worksheet = sheet.worksheet('dbg-ct')
+
+
+    return sheet, worksheet
 
 
 def leaderboard(user: int, mode: int, lb_name):
@@ -163,6 +180,7 @@ def funni_pet(input):
         frames.append(new_frame)
 
     frames[1].save("output.gif", save_all=True, append_images=frames[1:], loop=gif.info['loop'], disposal=2, duration=30)
+
 
 def outfit(helmet_rando, armor_rando, boots_rando, guild):
     player = Image.open("player default stance.png")
@@ -311,12 +329,35 @@ def outfit(helmet_rando, armor_rando, boots_rando, guild):
     print('Done!')
 
 
+def update_counting_sheet(number, user, user_id, timestamp, message):
+    timestamp_str = timestamp.strftime("%d/%m/%Y %I:%M:%S %p")
+    data = [number, user, str(user_id), timestamp_str, message]
+
+    # Read column A once (single API call)
+    col_a = worksheet.col_values(1)
+    first_empty_row = len(col_a) + 1
+
+    # Write the row directly
+    worksheet.update(f"A{first_empty_row}:E{first_empty_row}", [data])
+    print(f"Appended to row {first_empty_row}")
+
+
+def update_with_matrix(matrice):
+    matrix_len = 1
+    for i in matrice:
+        matrix_len += 1
+    
+    worksheet.update(f"A2:E{matrix_len}", matrice)
+
+sheet, worksheet = init_sheet()
+
 class Fun(commands.GroupCog, name="fun"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         super().__init__()
 
     @app_commands.command(name="stab", description="Stab someone idk")
+    @app_commands.checks.cooldown(1, 10.0, key=lambda i: i.guild_id)
     @app_commands.describe(invisible="Enabling this will only make the command visible for you (automatically off for #bot-commands")
     async def stab(self, interaction: discord.Interaction, user: discord.Member, invisible: bool = False) -> None:
         global cooldown
@@ -331,51 +372,48 @@ class Fun(commands.GroupCog, name="fun"):
         elif user.id == 230678674435735552:
             await interaction.response.send_message("<a:vertgun:1201573150132019321>")
             return
-        if cooldown is False:
-            if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-                await interaction.response.defer()
-            elif invisible is True:
-                await interaction.response.defer(ephemeral=True)
-            else:
-                await interaction.response.defer()
-            stab_chance = random.randint(1, 4)
-            print("hah")
-            if user.id == 1135983715646976111:
-                await user.avatar.save('avatar.png')
-                print("idk")
-                print(stab_chance)
-                if stab_chance == 4:
-                    funni_gif('avatar.png')
-                else:
-                    funni_pet('avatar.png')
-            else:
-                await user.avatar.save('avatar.png')
-                funni_gif('avatar.png')
 
-            guild = self.bot.get_guild(993818190008287283)
-            for emoji in guild.emojis:
-                if emoji.name == "output":
-                    await emoji.delete()
-                    break
-
-            with open("output.gif", "rb") as img:
-                img_byte = img.read()
-                await guild.create_custom_emoji(name="output", image=img_byte)
-                await asyncio.sleep(2)
-
-            for emoji in guild.emojis:
-                if emoji.name == "output":
-                    emote = emoji
-                    break
-
-            await interaction.followup.send(emote)
-            cooldown = True
-            print(cooldown)
-            await cd()
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
+            await interaction.response.defer(ephemeral=True)
         else:
-            await interaction.response.send_message(f"Command in cooldown, {30 - counter}s left", ephemeral=True)
+            await interaction.response.defer()
+
+        stab_chance = random.randint(1, 4)
+        print("hah")
+        if user.id == 1135983715646976111:
+            await user.avatar.save('avatar.png')
+            print("idk")
+            print(stab_chance)
+            if stab_chance == 4:
+                funni_gif('avatar.png')
+            else:
+                funni_pet('avatar.png')
+        else:
+            await user.avatar.save('avatar.png')
+            funni_gif('avatar.png')
+
+        guild = self.bot.get_guild(993818190008287283)
+        for emoji in guild.emojis:
+            if emoji.name == "output":
+                await emoji.delete()
+                break
+
+        with open("output.gif", "rb") as img:
+            img_byte = img.read()
+            await guild.create_custom_emoji(name="output", image=img_byte)
+            await asyncio.sleep(2)
+
+        for emoji in guild.emojis:
+            if emoji.name == "output":
+                emote = emoji
+                break
+
+        await interaction.followup.send(emote)
 
     @app_commands.command(name="pet", description="Pet someone idk")
+    @app_commands.checks.cooldown(1, 10.0, key=lambda i: i.guild_id)
     @app_commands.describe(invisible="Enabling this will only make the command visible for you (automatically off for #bot-commands")
     async def pet(self, interaction: discord.Interaction, user: discord.Member, invisible: bool = False) -> None:
         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
@@ -552,6 +590,66 @@ class Fun(commands.GroupCog, name="fun"):
         else:
             await interaction.response.send_message("This only works in the official Days Bygone server.", ephemeral=True)
 
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+
+        if message.channel.name == "counting-game" and message.guild.id == 570929677732937738:
+            if message.author.id == 639599059036012605 and "ruined it" in message.content.lower():
+                number = re.findall(r'^\D*(\d+)',str(message.content)[21:])[0]
+                print(number)
+                original_message = None
+
+                if message.reference and isinstance(message.reference.resolved, discord.Message):
+                    original_message = message.reference.resolved
+                elif message.reference:
+                    # Fallback if the message isn't cached
+                    channel = message.channel
+                    original_message = await channel.fetch_message(message.reference.message_id)
+
+
+                update_counting_sheet(number, original_message.author.display_name, original_message.author.id, datetime.datetime.now(), str(original_message.content))
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def alta_history(self, ctx):
+        date = pytz.timezone("Europe/Bucharest").localize(datetime.datetime(2025, 2, 9, 23, 0))
+        channel = self.bot.get_channel(1367130635801722972)
+        utc_time = date.astimezone(pytz.utc)
+        lista = []
+        print(channel)
+
+        async for message in channel.history(limit=None, after=utc_time, oldest_first=True):
+            if message.author.id == 639599059036012605 and "ruined it" in message.content.lower():
+                number = re.findall(r'^\D*(\d+)',str(message.content)[21:])[0]
+                print(number)
+                original_message = None
+
+                try:
+                    if message.reference and isinstance(message.reference.resolved, discord.Message):
+                        original_message = message.reference.resolved
+                    elif message.reference:
+                        # Fallback if the message isn't cached
+                        channel = message.channel
+                        original_message = await channel.fetch_message(message.reference.message_id)
+                except:
+                    continue
+
+                if not original_message:
+                    continue
+
+                lista.append([str(number), original_message.author.display_name, str(original_message.author.id), message.created_at.strftime("%d/%m/%Y %I:%M:%S %p"), str(original_message.content)])
+
+        print(lista)
+        update_with_matrix(lista)
+
+    @stab.error
+    @pet.error
+    async def on_pet_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.CommandOnCooldown):
+            await interaction.response.send_message(str(error), ephemeral=True)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Fun(bot))

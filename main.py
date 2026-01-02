@@ -13,7 +13,6 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 discord.utils.setup_logging(level=logging.INFO, root=False)
 
-
 @bot.command()
 @commands.is_owner()
 async def server_info(ctx):
@@ -23,11 +22,10 @@ async def server_info(ctx):
         await asyncio.sleep(1)
     await ctx.reply(guilds, mention_author=False)
 
-
 @bot.command()
 @commands.guild_only()
 async def sync(
-        ctx: Context, guilds: Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
+  ctx: Context, guilds: Greedy[discord.Object], spec: Optional[Literal["~", "*", "^"]] = None) -> None:
     if ctx.author.id == 556836294710525952:
         if not guilds:
             if spec == "~":
@@ -41,12 +39,12 @@ async def sync(
                 synced = []
             else:
                 synced = await ctx.bot.tree.sync()
-
+    
             await ctx.send(
                 f"Synced {len(synced)} commands {'globally' if spec is None else 'to the current guild.'}"
             )
             return
-
+    
         ret = 0
         for guild in guilds:
             try:
@@ -55,7 +53,7 @@ async def sync(
                 pass
             else:
                 ret += 1
-
+    
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
     else:
         await ctx.send("Stop syncing idiot")
@@ -71,7 +69,7 @@ async def on_ready():
 
 
 async def load_extensions():
-    for filename in os.listdir("./chestii"):
+    for filename in os.listdir("chestii"):
         if filename.endswith(".py"):
             await bot.load_extension(f"chestii.{filename[:-3]}")
             print(f"{filename[:-3].title()} loaded!")
@@ -80,6 +78,6 @@ async def load_extensions():
 async def amogus():
     await load_extensions()
     bot.tree.copy_global_to(guild=discord.Object(id=993818190008287283))
-    await bot.start("idk")
+    await bot.start(os.environ["TOKEN"])
 
 asyncio.run(amogus())
