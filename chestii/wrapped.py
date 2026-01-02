@@ -41,7 +41,7 @@ def update_wrapped_data(command_type: str, *function_params, username: str = "",
 
     # expect 4 params here, each if the user got each respective kuru
     if command_type == "kurukuru":
-        if command_type not in wrapped_data:
+        if "kuru1" not in wrapped_data["kurukuru"]:
             wrapped_data["kurukuru"] = {"kuru1": 0, "kuru2": 0, "kuru3": 0, "kuru4": 0, "usernames": [], "ids": []}
 
         wrapped_data["kurukuru"]["kuru1"] += function_params[0]

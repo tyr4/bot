@@ -15,6 +15,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 from chestii import jail
+from chestii.wrapped import update_wrapped_data
 
 log_ok = 0
 
@@ -371,7 +372,7 @@ class Funni(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.id == 1135983715646976111:
+        if message.author.id == self.bot.user.id:
             return
 
         try:
@@ -412,6 +413,7 @@ class Funni(commands.Cog):
             z = randint(1, 1000)
             zplus = randint(1, 10000)
             kurukuru_jackpo = randint(1, 100000)
+            kurukuru2 = 0
             if "the" in masaj and "man" in masaj and message.author.id in [556836294710525952, 278798822937853953]:
                 if masaj.index("the") < masaj.index("man"):
                     await message.channel.send("Dave the man <:LETSFUCKINGGOO:1286739473085759519>", reference=message,
@@ -427,10 +429,13 @@ class Funni(commands.Cog):
                         update(str(message.author.id), str(message.author), 2)
 
                 if message.channel.id not in [696035168414072913, 1069249122428780636, 1367130635801722972]:
-                    if kurukuru_jackpo == 100000 and message.author.id != 977660878080057344:
-                        await message.reply("https://tenor.com/view/kuru-kuru-gif-10882574602170874277",
-                                            mention_author=False)
-                        update(str(message.author.id), str(message.author), 4)
+                    if kurukuru_jackpo == 100000:
+                        if message.author.id == 977660878080057344:
+                            kurukuru_jackpo = 0
+                        else:
+                            await message.reply("https://tenor.com/view/kuru-kuru-gif-10882574602170874277",
+                                                mention_author=False)
+                            update(str(message.author.id), str(message.author), 4)
 
                     if zplus == 10000 or str(message.channel) == "amogus":
                         await message.reply("<a:kurukuru:1113242215083421707>", mention_author=False)
@@ -439,6 +444,10 @@ class Funni(commands.Cog):
                 if zplus == 10000 or kurukuru_jackpo == 100000 or z == 1000:
                     chanel = self.bot.get_channel(1224041578407002153)
                     await chanel.send(file=discord.File("data.json"))
+
+                    update_wrapped_data("kurukuru", z == 1000, kurukuru2 == 5000, zplus == 10000, kurukuru_jackpo == 100000, username=str(message.author), user_id=message.author.id)
+                    chanel = self.bot.get_channel(1456699085422727402)
+                    await chanel.send(file=discord.File("wrapped.json"))
 
             if "silwuf" in message.content and "prestige" in message.content:
                 await message.channel.send(
