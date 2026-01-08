@@ -40,7 +40,6 @@ async def update_wrapped_data(command_type: str, *function_params, username: str
 
         # expect 4 params here, each if the user got each respective kuru
         if command_type == "kurukuru":
-            print("AM INTRAT COAIE IN IF IAR")
             if "kuru1user" not in wrapped_data["kurukuru"]:
                 wrapped_data["kurukuru"] = {"kuru1user": [], "kuru2user": [], "kuru3user": [], "kuru4user": [], "kuru1id": [], "kuru2id": [], "kuru3id": [], "kuru4id": [], "usernames": [], "ids": []}
 

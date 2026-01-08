@@ -435,13 +435,10 @@ class Funni(commands.Cog):
                     chanel = self.bot.get_channel(1224041578407002153)
                     await chanel.send(file=discord.File("data.json"))
 
-                    # await chanel.send(f"AM INTRAT IN IF COAIE {zplus, kurukuru_jackpo, z}")
-
                     await update_wrapped_data("kurukuru", z == 1000, kurukuru2 == 5, zplus == 10000, kurukuru_jackpo == 100000, username=str(message.author), user_id=message.author.id)
+
                     chanel = self.bot.get_channel(1456699085422727402)
                     await chanel.send(file=discord.File("wrapped.json"))
-
-                    # await chanel.send("CUMVA AM AJUNS AICI")
 
             if "silwuf" in message.content and "prestige" in message.content:
                 await message.channel.send(
