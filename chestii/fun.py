@@ -16,6 +16,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import csv
 
+from chestii.wrapped import update_wrapped_data
 
 cooldown = False
 leaderboard_spots = [":first_place:", ":second_place:", ":third_place:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":nine:", ":keycap_ten:"]
@@ -412,6 +413,9 @@ class Fun(commands.GroupCog, name="fun"):
 
         await interaction.followup.send(emote)
 
+        await update_wrapped_data("stab", user.name, user.id, invisible, username=interaction.user.name,
+                    user_id=interaction.user.id)
+
     @app_commands.command(name="pet", description="Pet someone idk")
     @app_commands.checks.cooldown(1, 10.0, key=lambda i: i.guild_id)
     @app_commands.describe(invisible="Enabling this will only make the command visible for you (automatically off for #bot-commands")
@@ -442,6 +446,9 @@ class Fun(commands.GroupCog, name="fun"):
                 break
 
         await interaction.followup.send(emote)
+
+        await update_wrapped_data("pet", user.name, user.id, invisible, username=interaction.user.name,
+            user_id=interaction.user.id)
 
     @app_commands.command(name="defender_outfit", description="Visual representation of gear on Defender")
     @app_commands.describe(helmet="Pick the first option if the helmet you want is in the 2nd list, else pick one from here")
@@ -548,6 +555,9 @@ class Fun(commands.GroupCog, name="fun"):
             await interaction.response.send_message(file=discord.File('defender drip.png'))
         await interaction.response.send_message(file=discord.File('defender drip.png'))
 
+        await update_wrapped_data("defender_outfit", helm_value, chestplate.value, boots.value, invisible, username=interaction.user.name,
+            user_id=interaction.user.id)
+
     @app_commands.command(name="random_defender_outfit", description="Visual representation of random gear on Defender")
     @app_commands.describe(invisible="Enabling this will only make the command visible for you (automatically off for #bot-commands")
     async def random_defefefneder(self, interaction: discord.Interaction, invisible: bool = True):
@@ -571,6 +581,9 @@ class Fun(commands.GroupCog, name="fun"):
             await interaction.response.send_message(file=discord.File('defender drip.png'))
         await interaction.response.send_message(file=discord.File('defender drip.png'))
 
+        await update_wrapped_data("random_defender_outfit", invisible, username=interaction.user.name,
+            user_id=interaction.user.id)
+
     @app_commands.command(name="kurukuru_leaderboard", description="Leaderboard for the Kurukuru reactions/replies")
     @app_commands.describe(invisible="Enabling this will only make the command visible for you (automatically off for #bot-commands")
     @app_commands.choices(stats=[
@@ -589,6 +602,9 @@ class Fun(commands.GroupCog, name="fun"):
                 await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("This only works in the official Days Bygone server.", ephemeral=True)
+
+        await update_wrapped_data("kurukuru_leaderboard", stats.value, invisible, username=interaction.user.name,
+            user_id=interaction.user.id)
 
 
     @commands.Cog.listener()

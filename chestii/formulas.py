@@ -1300,7 +1300,7 @@ class Formulas(commands.GroupCog, name="calc"):
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Weapon Damage")
 
-        update_wrapped_data("weapon_damage", old_day, new_day, invisible, username=interaction.user.name, user_id=interaction.user.id)
+        await update_wrapped_data("weapon_damage", old_day, new_day, invisible, username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="daytodamage", description="Input a Day to receive the estimate one-shot damage "
                                                           "required to beat it")
@@ -1323,7 +1323,7 @@ class Formulas(commands.GroupCog, name="calc"):
             await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
 
-        update_wrapped_data("day_to_damage", day, invisible, username=interaction.user.name,
+        await update_wrapped_data("day_to_damage", day, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
 
     @app_commands.command(name="damagetoday", description="Input the damage number of your DPS Hero to get an estimate "
@@ -1349,7 +1349,7 @@ class Formulas(commands.GroupCog, name="calc"):
             await interaction.followup.send(embed=embed)
         print("Done w/ Damage to Day")
 
-        update_wrapped_data("damage_to_day", damage, suffix, invisible, username=interaction.user.name,
+        await update_wrapped_data("damage_to_day", damage, suffix, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
 
     @app_commands.command(name="multiplier", description="Input a damage multiplier to receive a Day equivalent")
@@ -1375,7 +1375,7 @@ class Formulas(commands.GroupCog, name="calc"):
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Multiplier")
 
-        update_wrapped_data("multiplier", multiplier, invisible, username=interaction.user.name,
+        await update_wrapped_data("multiplier", multiplier, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
 
     @app_commands.command(name="rewindspots", description="Input a day & the days to look ahead to receive the Rewind "
@@ -1405,7 +1405,7 @@ class Formulas(commands.GroupCog, name="calc"):
                 , ephemeral=True)
         print("Done w/ Rewind Spots")
 
-        update_wrapped_data("rewind_spots", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
+        await update_wrapped_data("rewind_spots", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
 
     @app_commands.command(name="detailed_rewindspot", description="Input a day to receive detailed info on the spot ("
@@ -1433,7 +1433,7 @@ class Formulas(commands.GroupCog, name="calc"):
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Detailed Spot")
 
-        update_wrapped_data("detailed_rewindspot", day, tj, express, invisible, username=interaction.user.name,
+        await update_wrapped_data("detailed_rewindspot", day, tj, express, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
 
     @app_commands.command(name="best_rewindspot", description="Input a day & the days to look ahead to receive the day with the "
@@ -1462,7 +1462,7 @@ class Formulas(commands.GroupCog, name="calc"):
                                                     "not available below Day 1000.", ephemeral=True)
         print("Done w/ Best Spots")
 
-        update_wrapped_data("best_rewindspot", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
+        await update_wrapped_data("best_rewindspot", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
 
     @app_commands.command(name="optimal_rewind",
@@ -1506,9 +1506,9 @@ class Formulas(commands.GroupCog, name="calc"):
 
         print("Done w/ Elixir calc")
 
-        update_wrapped_data("optimal_rewind", em_level, elixir_per_rewind, all_skills_old, all_skills_new, include_boss_slayer, invisible, username=interaction.user.name,
+        await update_wrapped_data("optimal_rewind", em_level, elixir_per_rewind, all_skills_old, all_skills_new, include_boss_slayer, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
-
+        
     # @app_commands.command(name="dungeon_gold",
     #                       description="Input your dungeon data to receive the best way to spend your keys")
     # @app_commands.describe(crit_dmg_stat_level="Stat Menu -> Crit DMG Stat info button -> Blue number. NOT the percentage value, but the level")

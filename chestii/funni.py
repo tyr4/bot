@@ -70,9 +70,9 @@ def rateup_embed():
         "<:Hero_Joan:1247636855877406771>",
         "<:Hero_Iseria:1247636854816243822>",
         "<:Hero_Zeus:1247637113521049630>",
-        "boreas emote"
+        "<:Hero_Boreas:1452633290019442863>"
     ]
-    fates_rateup_names = ['Joan of Arc', 'Iseria', 'Zeus', 'boreas erou']
+    fates_rateup_names = ['Joan of Arc', 'Iseria', 'Zeus', 'Boreas']
 
     zile_luni, curr_rateup = [], 0
     # DOAR ASTEA 3 CONTEAZA, NU CORESPUND CU INDICII DIN LISTE (DECAT CU -2 SAU CEVA)
@@ -123,7 +123,7 @@ def rateup_embed():
     embed.add_field(name='', value=f'Next rate-up is <t:{next_rateup:.0f}:R>', inline=False)
 
     embed.set_image(
-        url='https://cdn.discordapp.com/attachments/1141499425722740756/1287475081567670322/fate_rateup_rotated_because_dyluh_wanted_3.png')
+        url='https://media.discordapp.net/attachments/719614236745007315/1453043674643562538/rateup_boreas.png?ex=694c03e0&is=694ab260&hm=8079db31235cf2ae2b4e7fe39d6aa584285c95ef5e91b7c5bd4b7b4c804db750&=&quality=lossless')
 
     return embed
 
@@ -142,7 +142,7 @@ def init_sheet():
     gc = gspread.authorize(creds)
 
     # Open the Google Sheet by its title or URL
-    sheet = gc.open_by_key("1EbehjCiKE3rwCbMcvdV4bZxIyyigdE3CzPqWj9pBiJg")
+    sheet = gc.open_by_key("1cq3kCdWNpyiOA_XKiUPi62XyspexsgyIP48yMkGmEqM")
     worksheet = sheet.worksheet('Sheet1')
 
     return sheet, worksheet
@@ -164,16 +164,7 @@ def dump_all_info_alpha_sheet(text_matrix):
     worksheet.append_rows(text_matrix, value_input_option="RAW")
     print(f"Appended {len(text_matrix)} rows")
 
-
-def update_alpha_sheet(nickname, username, user_id, text_input):
-    data = ["None", "None", nickname, username, str(user_id)] + text_input
-
-    worksheet.append_row(data, value_input_option="RAW")
-
-    print("te omor")
-
-
-sheet, worksheet = init_sheet()
+# sheet, worksheet = init_sheet()
 
 
 def update(user_id: str, name, mode):
@@ -246,7 +237,7 @@ class Funni(commands.Cog):
         help_channel = await self.bot.fetch_channel(696035168414072913)
 
         embed_message_general = await general_channel.fetch_message(1369768813272371210)
-        embed_message_help = await self.bot.fetch_message(1453161876375601196)
+        embed_message_help = await help_channel.fetch_message(1453161876375601196)
 
     # @commands.command()
     # @commands.has_permissions(administrator=True)
@@ -339,9 +330,9 @@ class Funni(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def alpha_history(self, ctx):
+    async def alpha_history(self, ctx, channel_id):
         data = datetime.datetime(2025, 8, 20, tzinfo=pytz.utc)
-        channel = self.bot.get_channel(1409634645682684077)
+        channel = self.bot.get_channel(int(channel_id))
         counter = 0
         start = time.time()
         matrix = []
@@ -351,8 +342,7 @@ class Funni(commands.Cog):
                 continue
 
             counter += 1
-            filtered_text = ["None", "None", message.author.display_name, message.author.name,
-                             str(message.author.id)] + filter_application_text(str(message.content))
+            filtered_text = [message.author.display_name, message.author.name, message.created_at.strftime("%Y-%m-%d %H:%M:%S"), str(message.author.id), str(message.content)]
             matrix.append(filtered_text)
             print(filtered_text)
 
@@ -372,7 +362,7 @@ class Funni(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.id == self.bot.user.id:
+        if message.author.id == 1135983715646976111:
             return
 
         try:
@@ -445,9 +435,13 @@ class Funni(commands.Cog):
                     chanel = self.bot.get_channel(1224041578407002153)
                     await chanel.send(file=discord.File("data.json"))
 
-                    update_wrapped_data("kurukuru", z == 1000, kurukuru2 == 5000, zplus == 10000, kurukuru_jackpo == 100000, username=str(message.author), user_id=message.author.id)
+                    # await chanel.send(f"AM INTRAT IN IF COAIE {zplus, kurukuru_jackpo, z}")
+
+                    await update_wrapped_data("kurukuru", z == 1000, kurukuru2 == 5, zplus == 10000, kurukuru_jackpo == 100000, username=str(message.author), user_id=message.author.id)
                     chanel = self.bot.get_channel(1456699085422727402)
                     await chanel.send(file=discord.File("wrapped.json"))
+
+                    # await chanel.send("CUMVA AM AJUNS AICI")
 
             if "silwuf" in message.content and "prestige" in message.content:
                 await message.channel.send(
@@ -478,21 +472,25 @@ class Funni(commands.Cog):
                     f"An updated gala for players at 0-36k like <@977660878080057344> and me: [THE NEW GALA](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
                     "If you only want to use the command for yourself, you can use it in <#699337693238263900> or find the link in <#637933543699513367>",
                     mention_author=False)
+                await update_wrapped_data("?gala", username=message.author.name, user_id=message.author.id)
 
             if "?evl" in message.content.lower():
                 await message.reply(
-                    f"An updated evl for players at 0-36k like <@{message.author.id}> and me: [THE NEW EVL](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
+                    f"An updated evl for players at 0-36k like <@553194887701331969> and me: [THE NEW EVL](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
                     "If you only want to use the command for yourself, you can use it in <#699337693238263900> or find the link in <#637933543699513367>")
+                await update_wrapped_data("?evl", username=message.author.name, user_id=message.author.id)
 
             if "?rateup" in message.content.lower():
                 await message.reply(
                     "Weekly Hero Rate-up: https://discord.com/channels/570929677732937738/570929677732937740/1369768813272371210",
                     mention_author=False)
+                await update_wrapped_data("?rateup", username=message.author.name, user_id=message.author.id)
 
             if "?halloween" in message.content.lower():
                 await message.reply(
                     "Halloween Event Boss Team: <:Hero_DarkMerlin:703020537089097789> <:Hero_Mikhail:703033570402238495> <:Hero_Max:703017718835838997> <:Hero_Dewitt:703020422005915658> <:Hero_Saul:977594194988236861> <:Hero_Garp:729434017296023675> (decent for all difficulties)\n" \
                     "For Insane, 15* <:Hero_DarkMerlin:703020537089097789> is required", mention_author=False)
+                await update_wrapped_data("?halloween", username=message.author.name, user_id=message.author.id)
 
             exclusion_list = [696035168414072913, 1069249122428780636, 637388798396858379]
             parent_id = None
@@ -515,6 +513,8 @@ class Funni(commands.Cog):
                     chanel = self.bot.get_channel(1224041578407002153)
                     await chanel.send(file=discord.File('raids_list.json'))
 
+                    await update_wrapped_data("raids", username=message.author.name, user_id=message.author.id)
+
             a = message.content.lower()
 
             # if message.channel.id not in exclusion_list or message.channel.parent.id not in exclusion_list:
@@ -531,8 +531,8 @@ class Funni(commands.Cog):
             #         await chanel.send(file=discord.File('update_list.json'))
 
         elif message.guild.id in [993818190008287283, 1134464290477330432, 1030490217855074304]:
-            # global jailtime
-            # x = randint(1, 500)
+            global jailtime
+            x = randint(1, 500)
             #
             # if message.author.id == 352815253828141056 or "whar" in message.content.lower() or "whatr" in message.content.lower():
             #     await message.delete()
