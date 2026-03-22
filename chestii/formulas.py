@@ -1,3 +1,5 @@
+from typing import Optional
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -13,6 +15,10 @@ from chestii.wrapped import update_wrapped_data
 with open("ceva.csv") as csv_file:
     csv_reader = csv.reader(csv_file)
     lista_csv = list(csv_reader)
+
+with open("mobData.csv") as csv_file:
+    csv_reader = csv.reader(csv_file)
+    mob_data_csv = list(csv_reader)
 
 max_day = int(lista_csv[-1][0])
 double_rewind = False
@@ -77,8 +83,9 @@ levels = [
     '{a'
 ]
 
-
-hero_stars_dict = {10: 40,
+hero_stars_dict = \
+    {
+         10: 40,
          11: 89,
          12: 188,
          13: 387,
@@ -89,7 +96,80 @@ hero_stars_dict = {10: 40,
          18: 3982,
          19: 4781,
          20: 5580
-        }
+    }
+
+mob_data_dict = \
+    {
+         0: "",
+         1: "Dino",
+         2: "Rex",
+         3: "Caps",
+         4: "Gargoyle",
+         5: "Blob",
+         6: "Shade",
+         7: "Frosk",
+         8: "Warmonger",
+         9: "Banshee"
+    }
+print("EXIST")
+
+def mob_data(initial: int, how_many: int, filter_by: int):
+    how_many = min(200, how_many)
+    max_day = int(mob_data_csv[0][0])
+    embed = discord.Embed(title="Days Mob Data <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
+    embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
+                     icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
+    # raw range
+    result_list = mob_data_csv[max_day - initial : max_day - initial - how_many : -1]
+    print(result_list)
+
+    # apply filter
+    if filter_by != 0:  # keep all mob data
+        result_list = [x for x in result_list if x[1] == mob_data_dict[filter_by]]
+
+    if not result_list:
+        embed.add_field(name=f"No data for this range", value="", inline=False)
+
+        return embed
+
+    print(result_list, filter_by)
+    # build the output
+    embed.add_field(name=f"Starting Day: {initial}", value="", inline=False)
+    embed.add_field(name=f"", value="", inline=False)
+
+    output_string = "```"
+    for day in result_list:
+        next_string = ""
+
+        # normal output
+        next_string += f"Day {day[0]} (+{int(day[0]) - initial}): {day[1]}"
+
+        # boss day
+        if int(day[0]) % 5 == 0:
+            next_string += f" ({boss[int(day[0][-2:]) // 5]})".title()
+
+        next_string += "\n"
+
+        # check if it exceeds embed field length
+        if len(output_string) + len(next_string) > 1020:
+            embed.add_field(name="", value=output_string + "```", inline=False)
+            output_string = "```"
+
+        output_string += next_string
+
+    output_string += "```"
+    embed.add_field(name="", value=output_string, inline=False)
+
+    if filter_by != 0:
+        embed.set_field_at(1,
+                           name=f"",
+                           value=f"\n**Nearest Day with a {result_list[0][1]}: __{result_list[0][0]} (+{int(result_list[0][0]) - initial})__**"
+                                 f"\n**Next {"Awaken" if initial < 10220 else "Apple"}: ",
+                           inline=False)
+
+    print(output_string)
+
+    return embed
 
 def tot_tickets(initial: int, star: int = 15):
     sum = 0
@@ -1507,6 +1587,37 @@ class Formulas(commands.GroupCog, name="calc"):
         print("Done w/ Elixir calc")
 
         await update_wrapped_data("optimal_rewind", em_level, elixir_per_rewind, all_skills_old, all_skills_new, include_boss_slayer, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
+
+    @app_commands.command(name="nextmobs", description="Input your current day, the range you want to look up for and get the next mobs")
+    @app_commands.describe(starting_day="The starting day for the calculation")
+    @app_commands.describe(how_many="How many days above the starting day you want to calculate for")
+    @app_commands.choices(filter_by=[
+        discord.app_commands.Choice(name="All", value=0),
+        discord.app_commands.Choice(name="Dino", value=1),
+        discord.app_commands.Choice(name="Rex", value=2),
+        discord.app_commands.Choice(name="Caps", value=3),
+        discord.app_commands.Choice(name="Gargoyle", value=4),
+        discord.app_commands.Choice(name="Blob", value=5),
+        discord.app_commands.Choice(name="Shade", value=6),
+        discord.app_commands.Choice(name="Frosk", value=7),
+        discord.app_commands.Choice(name="Warmonger", value=8),
+        discord.app_commands.Choice(name="Banshee", value=9)
+    ])
+    async def mob_data_f(self, interaction: discord.Interaction, starting_day: int, how_many: int, filter_by: discord.app_commands.Choice[int], invisible: bool = True) -> None:
+        print(f"Trying Mob Data with the following data: starting {starting_day} how many {how_many} filter by {filter_by.value}")
+
+        embed = mob_data(starting_day, how_many, filter_by.value)
+
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.send_message(embed=embed)
+        elif invisible is True:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
+
+        print("Done w/ Mob Data")
+        await update_wrapped_data("mob_data", starting_day, how_many, filter_by.value, invisible, username=interaction.user.name,
                             user_id=interaction.user.id)
         
     # @app_commands.command(name="dungeon_gold",

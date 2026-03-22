@@ -7,10 +7,12 @@ from discord.ext import commands
 from discord.ext.commands import Greedy, Context
 import logging
 
+from chestii.shopping_list import AddButton
+
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
+bot = commands.Bot(command_prefix="?", intents=intents, help_command=None)
 discord.utils.setup_logging(level=logging.INFO, root=False)
 
 @bot.command()
@@ -65,6 +67,8 @@ async def on_ready():
     #     await bot.user.edit(avatar=avatar.read())
     print(f'{bot.user} has awoken')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="kurukuru"))
+
+    bot.add_view(AddButton())
     print("ඞ")
 
 
