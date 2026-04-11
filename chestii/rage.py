@@ -42,7 +42,7 @@ class Rage(commands.GroupCog, name="rage"):
         for key, value in sorted_data:
             embed.add_field(name="", value=f"<@{key}> --- {value['counter']} ori total", inline=False)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 async def setup(bot):

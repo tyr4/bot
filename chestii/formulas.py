@@ -46,107 +46,72 @@ mobs = ["dino", "rex", "shade", "frosk", "blob", "gargoyle", "caps", "warmonger"
 mob_scores = [1.93, 1.29, 1.94, 1.00, 1.92, 1.73, 1.92, 1.33, 1.65]
 
 levels = [
-    '', 'k', 'm', 'b', 't', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao',
-    'ap',
-    'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az', 'ba', 'bb', 'bc', 'bd', 'be', 'bf', 'bg', 'bh', 'bi',
-    'bj',
-    'bk', 'bl', 'bm', 'bn', 'bo', 'bp', 'bq', 'br', 'bs', 'bt', 'bu', 'bv', 'bw', 'bx', 'by', 'bz', 'ca', 'cb', 'cc',
-    'cd',
-    'ce', 'cf', 'cg', 'ch', 'ci', 'cj', 'ck', 'cl', 'cm', 'cn', 'co', 'cp', 'cq', 'cr', 'cs', 'ct', 'cu', 'cv', 'cw',
-    'cx',
-    'cy', 'cz', 'da', 'db', 'dc', 'dd', 'de', 'df', 'dg', 'dh', 'di', 'dj', 'dk', 'dl', 'dm', 'dn', 'do', 'dp', 'dq',
-    'dr',
-    'ds', 'dt', 'du', 'dv', 'dw', 'dx', 'dy', 'dz', 'ea', 'eb', 'ec', 'ed', 'ee', 'ef', 'eg', 'eh', 'ei', 'ej', 'ek',
-    'el',
-    'em', 'en', 'eo', 'ep', 'eq', 'er', 'es', 'et', 'eu', 'ev', 'ew', 'ex', 'ey', 'ez', 'fa', 'fb', 'fc', 'fd', 'fe',
-    'ff',
-    'fg', 'fh', 'fi', 'fj', 'fk', 'fl', 'fm', 'fn', 'fo', 'fp', 'fq', 'fr', 'fs', 'ft', 'fu', 'fv', 'fw', 'fx', 'fy',
-    'fz',
-    'ga', 'gb', 'gc', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gj', 'gk', 'gl', 'gm', 'gn', 'go', 'gp', 'gq', 'gr', 'gs',
-    'gt',
-    'gu', 'gv', 'gw', 'gx', 'gy', 'gz', 'ha', 'hb', 'hc', 'hd', 'he', 'hf', 'hg', 'hh', 'hi', 'hj', 'hk', 'hl', 'hm',
-    'hn',
-    'ho', 'hp', 'hq', 'hr', 'hs', 'ht', 'hu', 'hv', 'hw', 'hx', 'hy', 'hz', 'ia', 'ib', 'ic', 'id', 'ie', 'if', 'ig',
-    'ih',
-    'ii', 'ij', 'ik', 'il', 'im', 'in', 'io', 'ip', 'iq', 'ir', 'is', 'it', 'iu', 'iv', 'iw', 'ix', 'iy', 'iz', 'ja',
-    'jb',
-    'jc', 'jd', 'je', 'jf', 'jg', 'jh', 'ji', 'jj', 'jk', 'jl', 'jm', 'jn', 'jo', 'jp', 'jq', 'jr', 'js', 'jt', 'ju',
-    'jv',
-    'jw', 'jx', 'jy', 'jz', 'ka', 'kb', 'kc', 'kd', 'ke', 'kf', 'kg', 'kh', 'ki', 'kj', 'kk', 'kl', 'km', 'kn', 'ko',
-    'kp',
-    'kq', 'kr', 'ks', 'kt', 'ku', 'kv', 'kw', 'kx', 'ky', 'kz', 'la', 'lb', 'lc', 'ld', 'le', 'lf', 'lg', 'lh', 'li',
-    'lj',
-    'lk', 'll', 'lm', 'ln', 'lo', 'lp', 'lq', 'lr', 'ls', 'lt', 'lu', 'lv', 'lw', 'lx', 'ly', 'lz', 'ma', 'mb', 'mc',
-    'md',
-    'me', 'mf', 'mg', 'mh', 'mi', 'mj', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw',
-    'mx',
-    'my', 'mz', 'na', 'nb', 'nc', 'nd', 'ne', 'nf', 'ng', 'nh', 'ni', 'nj', 'nk', 'nl', 'nm', 'nn', 'no', 'np', 'nq',
-    'nr',
-    'ns', 'nt', 'nu', 'nv', 'nw', 'nx', 'ny', 'nz', 'oa', 'ob', 'oc', 'od', 'oe', 'of', 'og', 'oh', 'oi', 'oj', 'ok',
-    'ol',
-    'om', 'on', 'oo', 'op', 'oq', 'or', 'os', 'ot', 'ou', 'ov', 'ow', 'ox', 'oy', 'oz', 'pa', 'pb', 'pc', 'pd', 'pe',
-    'pf',
-    'pg', 'ph', 'pi', 'pj', 'pk', 'pl', 'pm', 'pn', 'po', 'pp', 'pq', 'pr', 'ps', 'pt', 'pu', 'pv', 'pw', 'px', 'py',
-    'pz',
-    'qa', 'qb', 'qc', 'qd', 'qe', 'qf', 'qg', 'qh', 'qi', 'qj', 'qk', 'ql', 'qm', 'qn', 'qo', 'qp', 'qq', 'qr', 'qs',
-    'qt',
-    'qu', 'qv', 'qw', 'qx', 'qy', 'qz', 'ra', 'rb', 'rc', 'rd', 're', 'rf', 'rg', 'rh', 'ri', 'rj', 'rk', 'rl', 'rm',
-    'rn',
-    'ro', 'rp', 'rq', 'rr', 'rs', 'rt', 'ru', 'rv', 'rw', 'rx', 'ry', 'rz', 'sa', 'sb', 'sc', 'sd', 'se', 'sf', 'sg',
-    'sh',
-    'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sp', 'sq', 'sr', 'ss', 'st', 'su', 'sv', 'sw', 'sx', 'sy', 'sz', 'ta',
-    'tb',
-    'tc', 'td', 'te', 'tf', 'tg', 'th', 'ti', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tp', 'tq', 'tr', 'ts', 'tt', 'tu',
-    'tv',
-    'tw', 'tx', 'ty', 'tz', 'ua', 'ub', 'uc', 'ud', 'ue', 'uf', 'ug', 'uh', 'ui', 'uj', 'uk', 'ul', 'um', 'un', 'uo',
-    'up',
-    'uq', 'ur', 'us', 'ut', 'uu', 'uv', 'uw', 'ux', 'uy', 'uz', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi',
-    'vj',
-    'vk', 'vl', 'vm', 'vn', 'vo', 'vp', 'vq', 'vr', 'vs', 'vt', 'vu', 'vv', 'vw', 'vx', 'vy', 'vz', 'wa', 'wb', 'wc',
-    'wd',
-    'we', 'wf', 'wg', 'wh', 'wi', 'wj', 'wk', 'wl', 'wm', 'wn', 'wo', 'wp', 'wq', 'wr', 'ws', 'wt', 'wu', 'wv', 'ww',
-    'wx',
-    'wy', 'wz', 'xa', 'xb', 'xc', 'xd', 'xe', 'xf', 'xg', 'xh', 'xi', 'xj', 'xk', 'xl', 'xm', 'xn', 'xo', 'xp', 'xq',
-    'xr',
-    'xs', 'xt', 'xu', 'xv', 'xw', 'xx', 'xy', 'xz', 'ya', 'yb', 'yc', 'yd', 'ye', 'yf', 'yg', 'yh', 'yi', 'yj', 'yk',
-    'yl',
-    'ym', 'yn', 'yo', 'yp', 'yq', 'yr', 'ys', 'yt', 'yu', 'yv', 'yw', 'yx', 'yy', 'yz', 'za', 'zb', 'zc', 'zd', 'ze',
-    'zf',
-    'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy',
-    'zz',
+    '', 'k', 'm', 'b', 't', 'aa', 'ab', 'ac', 'ad', 'ae', 'af', 'ag', 'ah', 'ai', 'aj', 'ak', 'al', 'am', 'an', 'ao', 'ap',
+    'aq', 'ar', 'as', 'at', 'au', 'av', 'aw', 'ax', 'ay', 'az', 'ba', 'bb', 'bc', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj',
+    'bk', 'bl', 'bm', 'bn', 'bo', 'bp', 'bq', 'br', 'bs', 'bt', 'bu', 'bv', 'bw', 'bx', 'by', 'bz', 'ca', 'cb', 'cc', 'cd',
+    'ce', 'cf', 'cg', 'ch', 'ci', 'cj', 'ck', 'cl', 'cm', 'cn', 'co', 'cp', 'cq', 'cr', 'cs', 'ct', 'cu', 'cv', 'cw', 'cx',
+    'cy', 'cz', 'da', 'db', 'dc', 'dd', 'de', 'df', 'dg', 'dh', 'di', 'dj', 'dk', 'dl', 'dm', 'dn', 'do', 'dp', 'dq', 'dr',
+    'ds', 'dt', 'du', 'dv', 'dw', 'dx', 'dy', 'dz', 'ea', 'eb', 'ec', 'ed', 'ee', 'ef', 'eg', 'eh', 'ei', 'ej', 'ek', 'el',
+    'em', 'en', 'eo', 'ep', 'eq', 'er', 'es', 'et', 'eu', 'ev', 'ew', 'ex', 'ey', 'ez', 'fa', 'fb', 'fc', 'fd', 'fe', 'ff',
+    'fg', 'fh', 'fi', 'fj', 'fk', 'fl', 'fm', 'fn', 'fo', 'fp', 'fq', 'fr', 'fs', 'ft', 'fu', 'fv', 'fw', 'fx', 'fy', 'fz',
+    'ga', 'gb', 'gc', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gj', 'gk', 'gl', 'gm', 'gn', 'go', 'gp', 'gq', 'gr', 'gs', 'gt',
+    'gu', 'gv', 'gw', 'gx', 'gy', 'gz', 'ha', 'hb', 'hc', 'hd', 'he', 'hf', 'hg', 'hh', 'hi', 'hj', 'hk', 'hl', 'hm', 'hn',
+    'ho', 'hp', 'hq', 'hr', 'hs', 'ht', 'hu', 'hv', 'hw', 'hx', 'hy', 'hz', 'ia', 'ib', 'ic', 'id', 'ie', 'if', 'ig', 'ih',
+    'ii', 'ij', 'ik', 'il', 'im', 'in', 'io', 'ip', 'iq', 'ir', 'is', 'it', 'iu', 'iv', 'iw', 'ix', 'iy', 'iz', 'ja', 'jb',
+    'jc', 'jd', 'je', 'jf', 'jg', 'jh', 'ji', 'jj', 'jk', 'jl', 'jm', 'jn', 'jo', 'jp', 'jq', 'jr', 'js', 'jt', 'ju', 'jv',
+    'jw', 'jx', 'jy', 'jz', 'ka', 'kb', 'kc', 'kd', 'ke', 'kf', 'kg', 'kh', 'ki', 'kj', 'kk', 'kl', 'km', 'kn', 'ko', 'kp',
+    'kq', 'kr', 'ks', 'kt', 'ku', 'kv', 'kw', 'kx', 'ky', 'kz', 'la', 'lb', 'lc', 'ld', 'le', 'lf', 'lg', 'lh', 'li', 'lj',
+    'lk', 'll', 'lm', 'ln', 'lo', 'lp', 'lq', 'lr', 'ls', 'lt', 'lu', 'lv', 'lw', 'lx', 'ly', 'lz', 'ma', 'mb', 'mc', 'md',
+    'me', 'mf', 'mg', 'mh', 'mi', 'mj', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx',
+    'my', 'mz', 'na', 'nb', 'nc', 'nd', 'ne', 'nf', 'ng', 'nh', 'ni', 'nj', 'nk', 'nl', 'nm', 'nn', 'no', 'np', 'nq', 'nr',
+    'ns', 'nt', 'nu', 'nv', 'nw', 'nx', 'ny', 'nz', 'oa', 'ob', 'oc', 'od', 'oe', 'of', 'og', 'oh', 'oi', 'oj', 'ok', 'ol',
+    'om', 'on', 'oo', 'op', 'oq', 'or', 'os', 'ot', 'ou', 'ov', 'ow', 'ox', 'oy', 'oz', 'pa', 'pb', 'pc', 'pd', 'pe', 'pf',
+    'pg', 'ph', 'pi', 'pj', 'pk', 'pl', 'pm', 'pn', 'po', 'pp', 'pq', 'pr', 'ps', 'pt', 'pu', 'pv', 'pw', 'px', 'py', 'pz',
+    'qa', 'qb', 'qc', 'qd', 'qe', 'qf', 'qg', 'qh', 'qi', 'qj', 'qk', 'ql', 'qm', 'qn', 'qo', 'qp', 'qq', 'qr', 'qs', 'qt',
+    'qu', 'qv', 'qw', 'qx', 'qy', 'qz', 'ra', 'rb', 'rc', 'rd', 're', 'rf', 'rg', 'rh', 'ri', 'rj', 'rk', 'rl', 'rm', 'rn',
+    'ro', 'rp', 'rq', 'rr', 'rs', 'rt', 'ru', 'rv', 'rw', 'rx', 'ry', 'rz', 'sa', 'sb', 'sc', 'sd', 'se', 'sf', 'sg', 'sh',
+    'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sp', 'sq', 'sr', 'ss', 'st', 'su', 'sv', 'sw', 'sx', 'sy', 'sz', 'ta', 'tb',
+    'tc', 'td', 'te', 'tf', 'tg', 'th', 'ti', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tp', 'tq', 'tr', 'ts', 'tt', 'tu', 'tv',
+    'tw', 'tx', 'ty', 'tz', 'ua', 'ub', 'uc', 'ud', 'ue', 'uf', 'ug', 'uh', 'ui', 'uj', 'uk', 'ul', 'um', 'un', 'uo', 'up',
+    'uq', 'ur', 'us', 'ut', 'uu', 'uv', 'uw', 'ux', 'uy', 'uz', 'va', 'vb', 'vc', 'vd', 've', 'vf', 'vg', 'vh', 'vi', 'vj',
+    'vk', 'vl', 'vm', 'vn', 'vo', 'vp', 'vq', 'vr', 'vs', 'vt', 'vu', 'vv', 'vw', 'vx', 'vy', 'vz', 'wa', 'wb', 'wc', 'wd',
+    'we', 'wf', 'wg', 'wh', 'wi', 'wj', 'wk', 'wl', 'wm', 'wn', 'wo', 'wp', 'wq', 'wr', 'ws', 'wt', 'wu', 'wv', 'ww', 'wx',
+    'wy', 'wz', 'xa', 'xb', 'xc', 'xd', 'xe', 'xf', 'xg', 'xh', 'xi', 'xj', 'xk', 'xl', 'xm', 'xn', 'xo', 'xp', 'xq', 'xr',
+    'xs', 'xt', 'xu', 'xv', 'xw', 'xx', 'xy', 'xz', 'ya', 'yb', 'yc', 'yd', 'ye', 'yf', 'yg', 'yh', 'yi', 'yj', 'yk', 'yl',
+    'ym', 'yn', 'yo', 'yp', 'yq', 'yr', 'ys', 'yt', 'yu', 'yv', 'yw', 'yx', 'yy', 'yz', 'za', 'zb', 'zc', 'zd', 'ze', 'zf',
+    'zg', 'zh', 'zi', 'zj', 'zk', 'zl', 'zm', 'zn', 'zo', 'zp', 'zq', 'zr', 'zs', 'zt', 'zu', 'zv', 'zw', 'zx', 'zy', 'zz',
     '{a'
 ]
 
 hero_stars_dict = \
     {
-        10: 40,
-        11: 89,
-        12: 188,
-        13: 387,
-        14: 786,
-        15: 1585,
-        16: 2384,
-        17: 3183,
-        18: 3982,
-        19: 4781,
-        20: 5580
+         10: 40,
+         11: 89,
+         12: 188,
+         13: 387,
+         14: 786,
+         15: 1585,
+         16: 2384,
+         17: 3183,
+         18: 3982,
+         19: 4781,
+         20: 5580
     }
 
 mob_data_dict = \
     {
-        0: "",
-        1: "Dino",
-        2: "Rex",
-        3: "Caps",
-        4: "Gargoyle",
-        5: "Blob",
-        6: "Shade",
-        7: "Frosk",
-        8: "Warmonger",
-        9: "Banshee"
+         0: "",
+         1: "Dino",
+         2: "Rex",
+         3: "Caps",
+         4: "Gargoyle",
+         5: "Blob",
+         6: "Shade",
+         7: "Frosk",
+         8: "Warmonger",
+         9: "Banshee"
     }
 print("EXIST")
-
 
 def mob_data(initial: int, how_many: int, filter_by: int):
     how_many = min(200, how_many)
@@ -155,7 +120,7 @@ def mob_data(initial: int, how_many: int, filter_by: int):
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
     # raw range
-    result_list = mob_data_csv[max_day - initial: max_day - initial - how_many: -1]
+    result_list = mob_data_csv[max_day - initial : max_day - initial - how_many : -1]
     print(result_list)
 
     # apply filter
@@ -199,26 +164,24 @@ def mob_data(initial: int, how_many: int, filter_by: int):
         embed.set_field_at(1,
                            name=f"",
                            value=f"\n**Nearest Day with a {result_list[0][1]}: __{result_list[0][0]} (+{int(result_list[0][0]) - initial})__**"
-                                 f"\n**Next {"Awaken" if initial < 10220 else "Apple"}: {(math.floor(day / 365) + 1) * 365}**",
+                                 f"\n**Next {"Awaken" if initial < 10220 else "Apple"}: {(math.floor(initial / 365) + 1) * 365}**",
                            inline=False)
-
-    embed.add_field(name="",
-                    value="*This command is using data from [Dodora's Mob Days List](https://docs.google.com/spreadsheets/d/1CfgZr4W588mnJSeFHlTeK9mmFo7rpBosEyOrjRempz8/edit?gid=0#gid=0)")
+    
+    embed.add_field(name="", value="*This command is using data from [Dodora's Mob Days List](https://docs.google.com/spreadsheets/d/1CfgZr4W588mnJSeFHlTeK9mmFo7rpBosEyOrjRempz8/edit?gid=0#gid=0)*")
 
     print(output_string)
 
     return embed
 
-
 def tot_tickets(initial: int, star: int = 15):
     sum = 0
-    text_blana = f"```1st ToT  -> {initial} total tickets ({(hero_stars_dict[star] * 50 / 7 / initial):.2f} weeks until {star}*)\n"
+    text_blana = f"```1st ToT  -> {initial} total tickets ({(hero_stars_dict[star] * 50 / 7  / initial):.2f} weeks until {star}*)\n"
     for i in range(20):
         rez = round((initial * (1 - 0.05 * i)), 2)
         rez = int(rez - 0.5) if str(rez - 0.5)[-1] == '0' else round(rez)
         sum += rez
         if (i + 1) % 5 == 0:
-            text_blana += f"{i + 1}th ToT{' ' if i <= 5 else ''} -> {sum} total tickets ({(hero_stars_dict[star] * 50 / 7 / sum):.2f} weeks until {star}*)\n"
+            text_blana += f"{i + 1}th ToT{' ' if i <= 5 else ''} -> {sum} total tickets ({(hero_stars_dict[star] * 50 / 7  / sum):.2f} weeks until {star}*)\n"
 
     embed = discord.Embed(title="ToT Ticket Calculator <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
     embed.add_field(name=f"", value=f'{text_blana}```', inline=False)
@@ -629,27 +592,22 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
 
     try:
         cdmg_suffix = '' if cdmg[-1].isdigit() else (cdmg[-1:] if cdmg[-2].isdigit() else cdmg[-2:])
-        cdmg_int = abs(
-            float(cdmg) if cdmg[-1].isdigit() else (float(cdmg[:-1]) if cdmg[-2].isdigit() else abs(float(cdmg[:-2]))))
+        cdmg_int = abs(float(cdmg) if cdmg[-1].isdigit() else (float(cdmg[:-1]) if cdmg[-2].isdigit() else abs(float(cdmg[:-2]))))
         cdmg_int *= (1000 ** (levels.index(cdmg_suffix)))
         cdmg_int = int(cdmg_int)
 
         gold_suffix = '' if gold[-1].isdigit() else (gold[-1:] if gold[-2].isdigit() else gold[-2:])
-        gold_int = abs(
-            float(gold) if gold[-1].isdigit() else (float(gold[:-1]) if gold[-2].isdigit() else abs(float(gold[:-2]))))
+        gold_int = abs(float(gold) if gold[-1].isdigit() else (float(gold[:-1]) if gold[-2].isdigit() else abs(float(gold[:-2]))))
         gold_int *= (1000 ** (levels.index(gold_suffix)))
         gold_int = int(gold_int)
 
         keys_suffix = '' if keys[-1].isdigit() else (keys[-1:] if keys[-2].isdigit() else keys[-2:])
-        keys_int = abs(
-            float(keys) if keys[-1].isdigit() else (float(keys[:-1]) if keys[-2].isdigit() else abs(float(keys[:-2]))))
+        keys_int = abs(float(keys) if keys[-1].isdigit() else (float(keys[:-1]) if keys[-2].isdigit() else abs(float(keys[:-2]))))
         keys_int *= (1000 ** (levels.index(keys_suffix)))
         keys_int = int(keys_int)
 
-        gold_level_suffix = '' if gold_level[-1].isdigit() else (
-            gold_level[-1:] if gold_level[-2].isdigit() else gold_level[-2:])
-        gold_level_int = abs(float(gold_level) if gold_level[-1].isdigit() else (
-            float(gold_level[:-1]) if gold_level[-2].isdigit() else abs(float(gold_level[:-2]))))
+        gold_level_suffix = '' if gold_level[-1].isdigit() else (gold_level[-1:] if gold_level[-2].isdigit() else gold_level[-2:])
+        gold_level_int = abs(float(gold_level) if gold_level[-1].isdigit() else (float(gold_level[:-1]) if gold_level[-2].isdigit() else abs(float(gold_level[:-2]))))
         gold_level_int *= (1000 ** levels.index(gold_level_suffix))
         gold_level_int = int(gold_level_int)
         if keys_int > gold_int:
@@ -684,12 +642,9 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
     target_start, target_start_suffix = nice_output(cdmg_copy)
     milestone_gold, milestone_gold_suffix = nice_output(milestone_gold_int)
 
-    while days((target_start * (
-            1000 ** (levels.index(target_start_suffix) - levels.index(cdmg_copy_suffix)))) / cdmg_copy_int,
-               stat_milestone) <= target:
+    while days((target_start * (1000 ** (levels.index(target_start_suffix) - levels.index(cdmg_copy_suffix)))) / cdmg_copy_int, stat_milestone) <= target:
         target_start += 0.01
-        stat_milestone = (len(str(int(target_start * (1000 ** levels.index(target_start_suffix))))) - len(
-            str(int(cdmg_copy_int * (1000 ** levels.index(cdmg_copy_suffix)))))) * 22 if \
+        stat_milestone = (len(str(int(target_start * (1000 ** levels.index(target_start_suffix))))) - len(str(int(cdmg_copy_int * (1000 ** levels.index(cdmg_copy_suffix)))))) * 22 if \
             len(str(int(cdmg_copy_int * (1000 ** levels.index(cdmg_copy_suffix))))) >= 5 else 0
         if target_start > 1000:
             target_start /= 1000
@@ -697,21 +652,16 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
 
     p = int(p)
     target_gold = sn((target_start * (1000 ** (levels.index(target_start_suffix))) - cdmg_copy), cdmg_copy, 0) * 10
-    target_gold_int, target_gold_suffix = nice_output(
-        sn((target_start * (1000 ** (levels.index(target_start_suffix))) - cdmg_copy), cdmg_copy, 0))
+    target_gold_int, target_gold_suffix = nice_output(sn((target_start * (1000 ** (levels.index(target_start_suffix))) - cdmg_copy), cdmg_copy, 0))
     target_end, target_end_suffix = nice_output(target_start * (1000 ** (levels.index(target_start_suffix))))
-    target_keys, target_keys_suffix = nice_output(
-        (sn((target_start * (1000 ** (levels.index(target_start_suffix))) - cdmg_copy), cdmg_copy, 0) / key_copy) * 10)
+    target_keys, target_keys_suffix = nice_output((sn((target_start * (1000 ** (levels.index(target_start_suffix))) - cdmg_copy), cdmg_copy, 0) / key_copy) * 10)
     target_keys = 10 if target_keys_suffix == '' and target_keys < 10 else target_keys
     current_days = days(p / cdmg_int_2, (len(str(int(p))) - len(str(int(cdmg_copy)))) * 22)
     milestone_days = days((milestone * (1000 ** levels.index(milestone_suffix))) / cdmg_copy, 22)
 
     min_target, min_target_keys, min_target_cdmg = funni_loop(target_gold, gold_level_int, key_gold_int, key_copy)
-    min_milestone, min_milestone_keys, min_milestone_cdmg = funni_loop(milestone_gold_int * 10, gold_level_int,
-                                                                       key_gold_int, key_copy)
-    overshot = days(
-        (target_start * (1000 ** (levels.index(target_start_suffix) - levels.index(cdmg_copy_suffix)))) / cdmg_copy_int,
-        stat_milestone) - target
+    min_milestone, min_milestone_keys, min_milestone_cdmg = funni_loop(milestone_gold_int * 10, gold_level_int, key_gold_int, key_copy)
+    overshot = days((target_start * (1000 ** (levels.index(target_start_suffix) - levels.index(cdmg_copy_suffix)))) / cdmg_copy_int, stat_milestone) - target
 
     print("a ok")
 
@@ -735,12 +685,10 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
     print(f"{format(milestone_gold, '.2f')}{milestone_gold_suffix} gold pt milestone")
 
     embed = discord.Embed(title="Dungeon Gold Calculator <a:kafkakurukuru:1118233531110412461>\n"
-                                "__DISCLAIMER: It's only recommended to use this if you have V7 Runes__",
-                          color=0x71368a)
+                                "__DISCLAIMER: It's only recommended to use this if you have V7 Runes__", color=0x71368a)
     embed.add_field(name="Do you want to make a quick adjustment? Long tap/copy the command you just used!",
                     value=f"/calc dungeon_gold crit_dmg_stat_level: {cdmg} gold_stat_level: {gold_level} gold_from_dungeon_keys: {gold} "
-                          f"current_keys: {keys} days_you_want_to_progress: {target} invisible: {invisible}",
-                    inline=False)
+                          f"current_keys: {keys} days_you_want_to_progress: {target} invisible: {invisible}", inline=False)
     embed.add_field(name="----------- Target days data -----------",
                     value=f"- {format(nice_output(min_target)[0], '.2f')}{nice_output(min_target)[1].upper() if nice_output(min_target)[1] in ['k', 'm', 'b', 't'] else nice_output(min_target)[1]} Minimum Keys\n"
                           f" - {format(nice_output(min_target_keys)[0], '.2f')}{nice_output(min_target_keys)[1].upper() if nice_output(min_target_keys)[1] in ['k', 'm', 'b', 't'] else nice_output(min_target_keys)[1]} Keys into Gold Stat\n"
@@ -765,8 +713,7 @@ def gold_sheet(cdmg: str, gold: str, gold_level: str, keys: str, target: float, 
     return embed
 
 
-def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_skills_new: str, invisible: bool,
-                include_boss_slayer: bool):
+def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_skills_new: str, invisible: bool, include_boss_slayer: bool):
     timeout = 30
     em_level = em_level.lower()
     elixir_per_rewind = elixir_per_rewind.lower()
@@ -859,37 +806,28 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
     print("am inceput timeru fraiere")
 
     try:
-        all_skills_old_suffix = '' if all_skills_old[-1].isdigit() else (
-            all_skills_old[-1:] if all_skills_old[-2].isdigit() else all_skills_old[-2:])
-        all_skills_old_int = abs(float(all_skills_old) if all_skills_old[-1].isdigit() else (
-            float(all_skills_old[:-1]) if all_skills_old[-2].isdigit() else abs(float(all_skills_old[:-2]))))
+        all_skills_old_suffix = '' if all_skills_old[-1].isdigit() else (all_skills_old[-1:] if all_skills_old[-2].isdigit() else all_skills_old[-2:])
+        all_skills_old_int = abs(float(all_skills_old) if all_skills_old[-1].isdigit() else (float(all_skills_old[:-1]) if all_skills_old[-2].isdigit() else abs(float(all_skills_old[:-2]))))
         all_skills_old_int *= (1000 ** (levels.index(all_skills_old_suffix))) * 2
 
-        all_skills_new_suffix = '' if all_skills_new[-1].isdigit() else (
-            all_skills_new[-1:] if all_skills_new[-2].isdigit() else all_skills_new[-2:])
-        all_skills_new_int = abs(float(all_skills_new) if all_skills_new[-1].isdigit() else (
-            float(all_skills_new[:-1]) if all_skills_new[-2].isdigit() else abs(float(all_skills_new[:-2]))))
+        all_skills_new_suffix = '' if all_skills_new[-1].isdigit() else (all_skills_new[-1:] if all_skills_new[-2].isdigit() else all_skills_new[-2:])
+        all_skills_new_int = abs(float(all_skills_new) if all_skills_new[-1].isdigit() else (float(all_skills_new[:-1]) if all_skills_new[-2].isdigit() else abs(float(all_skills_new[:-2]))))
         all_skills_new_int *= ((1000 ** (levels.index(all_skills_new_suffix))) * 2)
         all_skills_new_int -= 2
 
-        skills_int = ((((all_skills_new_int + 2) / 2 - all_skills_old_int / 2) / 2) * (
-                    all_skills_old_int + all_skills_new_int)) * 5
-        skills_int2 = ((((all_skills_new_int + 2) / 2 - all_skills_old_int / 2) / 2) * (
-                    all_skills_old_int + all_skills_new_int)) * 6
+        skills_int = ((((all_skills_new_int + 2) / 2 - all_skills_old_int / 2) / 2) * (all_skills_old_int + all_skills_new_int)) * 5
+        skills_int2 = ((((all_skills_new_int + 2) / 2 - all_skills_old_int / 2) / 2) * (all_skills_old_int + all_skills_new_int)) * 6
 
         em_level_suffix = '' if em_level[-1].isdigit() else (em_level[-1:] if em_level[-2].isdigit() else em_level[-2:])
         original_em_suffix = em_level_suffix
-        em_level_int = abs(float(em_level) if em_level[-1].isdigit() else (
-            float(em_level[:-1]) if em_level[-2].isdigit() else abs(float(em_level[:-2]))))
+        em_level_int = abs(float(em_level) if em_level[-1].isdigit() else (float(em_level[:-1]) if em_level[-2].isdigit() else abs(float(em_level[:-2]))))
         original_em_level = em_level_int
         em_level_int *= 1000 ** (levels.index(em_level_suffix))
         original_em_multi = em_level_int
 
-        elixir_rew_suffix = '' if elixir_per_rewind[-1].isdigit() else (
-            elixir_per_rewind[-1:] if elixir_per_rewind[-2].isdigit() else elixir_per_rewind[-2:])
+        elixir_rew_suffix = '' if elixir_per_rewind[-1].isdigit() else (elixir_per_rewind[-1:] if elixir_per_rewind[-2].isdigit() else elixir_per_rewind[-2:])
         original_rewind_suffix = elixir_rew_suffix
-        elixir_rew_int = abs(float(elixir_per_rewind) if elixir_per_rewind[-1].isdigit() else (
-            float(elixir_per_rewind[:-1]) if elixir_per_rewind[-2].isdigit() else abs(float(elixir_per_rewind[:-2]))))
+        elixir_rew_int = abs(float(elixir_per_rewind) if elixir_per_rewind[-1].isdigit() else (float(elixir_per_rewind[:-1]) if elixir_per_rewind[-2].isdigit() else abs(float(elixir_per_rewind[:-2]))))
         original_rewind_level = elixir_rew_int
         elixir_rew_int *= 1000 ** (levels.index(elixir_rew_suffix))
 
@@ -907,10 +845,8 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
     p = 1
     old_multi = 1
 
-    all_skills_old_int = abs(float(all_skills_old) if all_skills_old[-1].isdigit() else (
-        float(all_skills_old[:-1]) if all_skills_old[-2].isdigit() else abs(float(all_skills_old[:-2]))))
-    all_skills_new_int = abs(float(all_skills_new) if all_skills_new[-1].isdigit() else (
-        float(all_skills_new[:-1]) if all_skills_new[-2].isdigit() else abs(float(all_skills_new[:-2]))))
+    all_skills_old_int = abs(float(all_skills_old) if all_skills_old[-1].isdigit() else (float(all_skills_old[:-1]) if all_skills_old[-2].isdigit() else abs(float(all_skills_old[:-2]))))
+    all_skills_new_int = abs(float(all_skills_new) if all_skills_new[-1].isdigit() else (float(all_skills_new[:-1]) if all_skills_new[-2].isdigit() else abs(float(all_skills_new[:-2]))))
     print("merge?")
     while original_rewind_level >= 1000:
         original_rewind_level /= 1000
@@ -944,6 +880,7 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
         all_skills_new_int /= 1000
         all_skills_new_suffix = levels[levels.index(all_skills_new_suffix) + 1]
 
+
     if levels.index(all_skills_old_suffix) > levels.index(all_skills_new_suffix):
         print("TALPA N PIEPT MERITI")
         return 0
@@ -965,8 +902,7 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
     #                                                                                                   levels.index(all_skills_old_suffix))), 10)) - math.floor(math.log(all_skills_old_int, 10)))), 2) * 11
     # print(skill_days)
     print("haha loop1")
-    min_rew, min_skill, em_rewinds, em_level_int, elixir_rew_int = funni_loop(10 ** 200, skills_int, em_level_int,
-                                                                              elixir_rew_int,
+    min_rew, min_skill, em_rewinds, em_level_int, elixir_rew_int = funni_loop(10 ** 200, skills_int, em_level_int, elixir_rew_int,
                                                                               old_multi=old_multi)
     if min_skill > 10 ** 12:
         print("FABRICA DE BELELE")
@@ -981,16 +917,13 @@ def elixirsheet(em_level: str, elixir_per_rewind: str, all_skills_old: str, all_
 
     print("haha loop2")
     if include_boss_slayer:
-        min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int2,
-                                                                                       em_level_int,
+        min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int2, em_level_int,
                                                                                        elixir_rew_int, old_multi=1)
     else:
-        min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int,
-                                                                                       em_level_int,
+        min_rew2, min_skill2, em_rewinds2, em_level_int2, elixir_rew_int2 = funni_loop(10 ** 200, skills_int, em_level_int,
                                                                                        elixir_rew_int, old_multi=1)
     print("haha loop2 ok")
-    nice_em_level2, em_level_suffix2, nice_rewind_level2, elixir_rew_suffix2 = nice_output(em_level_int2,
-                                                                                           elixir_rew_int2)
+    nice_em_level2, em_level_suffix2, nice_rewind_level2, elixir_rew_suffix2 = nice_output(em_level_int2, elixir_rew_int2)
 
     print("???")
 
@@ -1084,19 +1017,16 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
 
     embed = discord.Embed(title="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
     if mode == 1:
-        embed.add_field(name='',
-                        value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ ({skip} Days last portal) has the best rewind score of __{format(minim_fishy, '.2f')}__ "
-                              f"({round(minim_dodo)}) for the next "
-                              f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1, double_rewind)}__ ({skip2} Days last portal) with a score of __{format(minim_fishy2, '.2f')}__"
-                              f" ({round(minimdodo2)}) and __{spot_range(day3, tj, express, 1, double_rewind)}__ ({skip3} Days last portal) with a score of __{format(minim_fishy3, '.2f')}__ ({round(minimdodo3)}). "
-                              f"The score inside brackets represents [Dodora's Rewind Sheet](https://bit.ly/Dodo_Rewind_Sheet) Cost.**",
-                        inline=False)
+        embed.add_field(name='', value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ ({skip} Days last portal) has the best rewind score of __{format(minim_fishy, '.2f')}__ "
+                                       f"({round(minim_dodo)}) for the next "
+                                       f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1, double_rewind)}__ ({skip2} Days last portal) with a score of __{format(minim_fishy2, '.2f')}__"
+                                       f" ({round(minimdodo2)}) and __{spot_range(day3, tj, express, 1, double_rewind)}__ ({skip3} Days last portal) with a score of __{format(minim_fishy3, '.2f')}__ ({round(minimdodo3)}). "
+                                       f"The score inside brackets represents [Dodora's Rewind Sheet](https://bit.ly/Dodo_Rewind_Sheet) Cost.**", inline=False)
     else:
-        embed.add_field(name='',
-                        value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ ({skip} Days last portal) has the best rewind time of __{secunda(int(minim_fishy))}__ for the next "
-                              f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1, double_rewind)}__ ({skip2} Days last portal) with a time of __{secunda(int(minim_fishy2))}__"
-                              f" and __{spot_range(day3, tj, express, 1, double_rewind)}__ ({skip3} Days last portal) with a time of __{secunda(int(minim_fishy3))}__.**\n\n***__Note: These times are approximations"
-                              f" and may not be 100% accurate.__***", inline=False)
+        embed.add_field(name='', value=f"**At Day {kek}, __Day {spot_range(day_minim, tj, express, 1, double_rewind)}__ ({skip} Days last portal) has the best rewind time of __{secunda(int(minim_fishy))}__ for the next "
+                                       f"{day_range} days.\n\nThe next best 2 spots are __{spot_range(day2, tj, express, 1, double_rewind)}__ ({skip2} Days last portal) with a time of __{secunda(int(minim_fishy2))}__"
+                                       f" and __{spot_range(day3, tj, express, 1, double_rewind)}__ ({skip3} Days last portal) with a time of __{secunda(int(minim_fishy3))}__.**\n\n***__Note: These times are approximations"
+                                       f" and may not be 100% accurate.__***", inline=False)
 
     embed.add_field(name='', value="*These calculations are using data from [Fishy's Rewind Sheet]"
                                    "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor options, look at the optional parameters.*")
@@ -1113,20 +1043,14 @@ def detailed_spot(daya: int, express: bool, tj: bool, double_rewind: bool, titor
         embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
         embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
                              "------------", value='', inline=False)
-        score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind,
-                                      mode=1)
+        score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=1)
         score_fishy = score_fishy_list[1]
         score_dodo = score_fishy_list[3]
         if daya > 1000:
-            score_seconds = secunda(
-                spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
-            embed.add_field(
-                name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.",
-                value='', inline=False)
+            score_seconds = secunda(spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
+            embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
         else:
-            embed.add_field(
-                name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.",
-                value='', inline=False)
+            embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
         if express:
             portal = 10 if daya // 500 == 0 else (daya // 500) * 10
         else:
@@ -1190,11 +1114,9 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
     minim_fishy, minim_dodo = 100000000, 100000000
     day_minim = 0
     if mode == 1:
-        embed = discord.Embed(
-            title="DAY --- SCORE --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
+        embed = discord.Embed(title="DAY --- SCORE --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
     else:
-        embed = discord.Embed(title="DAY --- TIME --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------",
-                              color=0x71368a)
+        embed = discord.Embed(title="DAY --- TIME --- LAST BOSS --- LAST PORTAL SKIP\n--------------------------------", color=0x71368a)
     embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
                          "------------", value='', inline=False)
     for day in spots:
@@ -1246,12 +1168,10 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
                 counter = 0
                 if mode == 1:
                     embed.add_field(name='-------------------------------------------\n'
-                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {format(min_fishy, '.2f')} ({min_dodo}) score",
-                                    value=ceva, inline=False)
+                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {format(min_fishy, '.2f')} ({min_dodo}) score", value=ceva, inline=False)
                 else:
                     embed.add_field(name='-------------------------------------------\n'
-                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {secunda(int(min_fishy))} time",
-                                    value=ceva, inline=False)
+                                         f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {secunda(int(min_fishy))} time", value=ceva, inline=False)
                 ceva = '```\n'
                 min_fishy = 1000000000
                 if min_fishy > lista[1]:
@@ -1280,9 +1200,8 @@ def spots(daya: int, day_range: int, tj: bool, express: bool, mode: int, titor: 
         embed.add_field(name='-------------------------------------------\n'
                              f"The best spot within this range is {spot_range(min_day, tj, express, 1, double_rewind)} with a {secunda(int(min_fishy))} time",
                         value=ceva, inline=False)
-        embed.add_field(name='',
-                        value="***__Note: These times are approximations and may not be 100% accurate.__***\n*These calculations are using data from [Fishy's Rewind Sheet]"
-                              "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor options, look at the optional parameters.*")
+        embed.add_field(name='', value="***__Note: These times are approximations and may not be 100% accurate.__***\n*These calculations are using data from [Fishy's Rewind Sheet]"
+                                       "(https://bit.ly/Fishy_Rewind_Sheet). If you want to use No TJ/No Express/Titor options, look at the optional parameters.*")
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
 
@@ -1435,15 +1354,13 @@ class Formulas(commands.GroupCog, name="calc"):
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(name="weapondamage",
-                          description="Input the old & new day of your weapon to find out how many "
-                                      "days you gain")
+    @app_commands.command(name="weapondamage", description="Input the old & new day of your weapon to find out how many "
+                                                           "days you gain")
     @app_commands.describe(old_day="Old Day/Level of your weapon")
     @app_commands.describe(new_day="New Day/Level of your weapon")
     @app_commands.user_install()
     @app_commands.allowed_installs(guilds=False, users=True)
-    async def weapondamage_f(self, interaction: discord.Interaction, old_day: int, new_day: int,
-                             invisible: bool = True) -> None:
+    async def weapondamage_f(self, interaction: discord.Interaction, old_day: int, new_day: int, invisible: bool = True) -> None:
         print(f"Trying Weapon Damage with the following data: Old Day: {old_day} New Day: {new_day}")
         rezultat = weapondamage(old_day, new_day)
         embed = discord.Embed(title="Weapon Damage Calculator <a:kafkakurukuru:1118233531110412461>",
@@ -1455,8 +1372,7 @@ class Formulas(commands.GroupCog, name="calc"):
                          icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
         if rezultat == 0:
             await interaction.response.send_message(f"Invalid data, please try again. Example: a level 10000 weapon "
-                                                    f"compared to a level 11000 weapon is worth 140 days.",
-                                                    ephemeral=True)
+                                                    f"compared to a level 11000 weapon is worth 140 days.", ephemeral=True)
         else:
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                 await interaction.response.send_message(embed=embed)
@@ -1466,8 +1382,7 @@ class Formulas(commands.GroupCog, name="calc"):
                 await interaction.response.send_message(embed=embed)
         print("Done w/ Weapon Damage")
 
-        await update_wrapped_data("weapon_damage", old_day, new_day, invisible, username=interaction.user.name,
-                                  user_id=interaction.user.id)
+        await update_wrapped_data("weapon_damage", old_day, new_day, invisible, username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="daytodamage", description="Input a Day to receive the estimate one-shot damage "
                                                           "required to beat it")
@@ -1491,18 +1406,17 @@ class Formulas(commands.GroupCog, name="calc"):
         print("Done w/ Damage to Day")
 
         await update_wrapped_data("day_to_damage", day, invisible, username=interaction.user.name,
-                                  user_id=interaction.user.id)
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="damagetoday", description="Input the damage number of your DPS Hero to get an estimate "
                                                           "of your one-shot pushing range")
     @app_commands.describe(damage="Damage number of your Main DPS Hero")
     @app_commands.describe(suffix="Suffix of the damage. Example: 'aa' is the suffix for '1aa' damage")
-    async def damagetoday_f(self, interaction: discord.Interaction, damage: str, suffix: str,
-                            invisible: bool = True) -> None:
+    async def damagetoday_f(self, interaction: discord.Interaction, damage: str, suffix: str, invisible: bool = True) -> None:
         print(f"Trying Damage to Day with the following data: Damage: {damage} Suffix {suffix}")
         # test_value = damagetoday(damage, suffix.lower(), True)
         # if test_value == 0:
-        # await interaction.response.defer(ephemeral=True)
+            # await interaction.response.defer(ephemeral=True)
         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
         elif invisible is True:
@@ -1518,11 +1432,10 @@ class Formulas(commands.GroupCog, name="calc"):
         print("Done w/ Damage to Day")
 
         await update_wrapped_data("damage_to_day", damage, suffix, invisible, username=interaction.user.name,
-                                  user_id=interaction.user.id)
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="multiplier", description="Input a damage multiplier to receive a Day equivalent")
-    @app_commands.describe(
-        multiplier="Multiplier value of the number you want to calculate. Example: A x50 multiplier is worth 62 days")
+    @app_commands.describe(multiplier="Multiplier value of the number you want to calculate. Example: A x50 multiplier is worth 62 days")
     async def multiplier(self, interaction: discord.Interaction, multiplier: int, invisible: bool = True) -> None:
         print(f"Trying Multiplier with the following data: Multiplier: {multiplier}")
         if multiplier < 0:
@@ -1532,10 +1445,8 @@ class Formulas(commands.GroupCog, name="calc"):
 
             embed = discord.Embed(title="Multiplier to Day Calculator <a:kafkakurukuru:1118233531110412461>",
                                   color=0x71368a)
-            embed.add_field(name='',
-                            value=f"A **x{multiplier}** Damage multiplier is worth **{round(math.log(multiplier, 1.066))}** Days! *This is also equal to "
-                                  f"**{round(math.log(multiplier * multiplier, 1.066))}** Days for Crit Damage.*",
-                            inline=False)
+            embed.add_field(name='', value=f"A **x{multiplier}** Damage multiplier is worth **{round(math.log(multiplier, 1.066))}** Days! *This is also equal to "
+                                           f"**{round(math.log(multiplier * multiplier, 1.066))}** Days for Crit Damage.*", inline=False)
             embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                              icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
             if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
@@ -1547,24 +1458,20 @@ class Formulas(commands.GroupCog, name="calc"):
         print("Done w/ Multiplier")
 
         await update_wrapped_data("multiplier", multiplier, invisible, username=interaction.user.name,
-                                  user_id=interaction.user.id)
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="rewindspots", description="Input a day & the days to look ahead to receive the Rewind "
                                                           "Scores for the said spots. Max 500.")
     @app_commands.describe(starting_day="Starting day for which you want to calculate spots for")
-    @app_commands.describe(
-        days_to_look_ahead="Days you want to look ahead the starting day, for all spots within that range")
-    async def spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int,
-                      invisible: bool = True, tj: bool = True, express: bool = True) -> None:
-        print(
-            f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel double")
+    @app_commands.describe(days_to_look_ahead="Days you want to look ahead the starting day, for all spots within that range")
+    async def spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
+        print(f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel double")
         if 50 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
             if double_rewind is True and starting_day < 10585:
                 await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
                 return
             else:
-                embed = spots(starting_day, days_to_look_ahead, tj=tj, express=express, mode=1, titor=1,
-                              double_rewind=False)
+                embed = spots(starting_day, min(days_to_look_ahead, 500), tj=tj, express=express, mode=1, titor=1, double_rewind=False)
                 if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                     await interaction.response.send_message(embed=embed)
                 elif invisible is True:
@@ -1580,26 +1487,23 @@ class Formulas(commands.GroupCog, name="calc"):
                 , ephemeral=True)
         print("Done w/ Rewind Spots")
 
-        await update_wrapped_data("rewind_spots", starting_day, days_to_look_ahead, tj, express, invisible,
-                                  username=interaction.user.name,
-                                  user_id=interaction.user.id)
+        await update_wrapped_data("rewind_spots", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="detailed_rewindspot", description="Input a day to receive detailed info on the spot ("
                                                                   "each Mob and Boss for each portal)")
     @app_commands.describe(day="Day of the Rewind spot you want the details for")
-    async def detailed_spots_f(self, interaction: discord.Interaction, day: int, invisible: bool = True,
-                               tj: bool = True, express: bool = True) -> None:
-        print(
-            f"Trying 'Detailed Spot' with the following data: Day: {day} titel double {double_rewind} tj {tj} express {express}")
+    async def detailed_spots_f(self, interaction: discord.Interaction, day: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
+        print(f"Trying 'Detailed Spot' with the following data: Day: {day} titel double {double_rewind} tj {tj} express {express}")
 
         if double_rewind is True and day < 10585:
             await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
             return
         else:
             # if day <= max_day:
-            embed = detailed_spot(day, express=express, tj=tj, double_rewind=False, titor=1)
-        # else:
-        #     embed = 0
+                embed = detailed_spot(day, express=express, tj=tj, double_rewind=False, titor=1)
+            # else:
+            #     embed = 0
         if embed == 0:
             await interaction.response.send_message("Invalid spot/data, please try again.", ephemeral=True)
         else:
@@ -1612,26 +1516,21 @@ class Formulas(commands.GroupCog, name="calc"):
         print("Done w/ Detailed Spot")
 
         await update_wrapped_data("detailed_rewindspot", day, tj, express, invisible, username=interaction.user.name,
-                                  user_id=interaction.user.id)
+                            user_id=interaction.user.id)
 
-    @app_commands.command(name="best_rewindspot",
-                          description="Input a day & the days to look ahead to receive the day with the "
-                                      "best Rewind Score")
+    @app_commands.command(name="best_rewindspot", description="Input a day & the days to look ahead to receive the day with the "
+                                                              "best Rewind Score")
     @app_commands.describe(starting_day="Starting day for which you want to calculate spots for")
-    @app_commands.describe(
-        days_to_look_ahead="Days you want to look ahead the starting day, for the best spots within that range")
-    async def best_spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int,
-                           invisible: bool = True,
+    @app_commands.describe(days_to_look_ahead="Days you want to look ahead the starting day, for the best spots within that range")
+    async def best_spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True,
                            tj: bool = True, express: bool = True) -> None:
-        print(
-            f"Trying 'Best Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel")
+        print(f"Trying 'Best Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel")
         if 100 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
             if double_rewind is True and starting_day < 10585:
                 await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
                 return
             else:
-                embed = best_spot(starting_day, days_to_look_ahead, express=express, tj=tj, mode=1, titor=1,
-                                  double_rewind=False)
+                embed = best_spot(starting_day, min(days_to_look_ahead, 500), express=express, tj=tj, mode=1, titor=1, double_rewind=False)
                 if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
                     await interaction.response.send_message(embed=embed)
                 elif invisible is True:
@@ -1639,31 +1538,26 @@ class Formulas(commands.GroupCog, name="calc"):
                 else:
                     await interaction.response.send_message(embed=embed)
         else:
-            await interaction.response.send_message(
-                "Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
-                "be greater than 100.\n- Starting day must be above 50.\nSecond approximations "
-                "not available below Day 1000.", ephemeral=True)
+            await interaction.response.send_message("Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
+                                                    f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
+                                                    "be greater than 100.\n- Starting day must be above 50.\nSecond approximations "
+                                                    "not available below Day 1000.", ephemeral=True)
         print("Done w/ Best Spots")
 
-        await update_wrapped_data("best_rewindspot", starting_day, days_to_look_ahead, tj, express, invisible,
-                                  username=interaction.user.name,
-                                  user_id=interaction.user.id)
+        await update_wrapped_data("best_rewindspot", starting_day, days_to_look_ahead, tj, express, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
     @app_commands.command(name="optimal_rewind",
                           description="Input your elixir data to receive the minimum amount of rewinds for your goal")
     @app_commands.describe(em_level="Level of your Elixir Mastery skill. Example: '15ag'")
     @app_commands.describe(elixir_per_rewind="Elixir per Max Day rewind. Example: '100aq'")
-    @app_commands.describe(
-        all_skills_old="Level of your current skills/starting point for the calculations (BS included). Example: '10M'")
+    @app_commands.describe(all_skills_old="Level of your current skills/starting point for the calculations (BS included). Example: '10M'")
     @app_commands.describe(all_skills_new="Level of the desired skill levels (BS included). Example: '20M'")
     @app_commands.describe(include_boss_slayer="Only change if you don't want BS included in your grind.")
     async def elixirsheet_f(self, interaction: discord.Interaction, em_level: str, elixir_per_rewind: str,
-                            all_skills_old: str, all_skills_new: str, include_boss_slayer: bool = True,
-                            invisible: bool = True) -> None:
-        print(
-            f"Trying Elixir Calc with the following data: em {em_level} elixir {elixir_per_rewind} old {all_skills_old} "
-            f"new {all_skills_new} bs {include_boss_slayer}")
+                            all_skills_old: str, all_skills_new: str, include_boss_slayer: bool = True, invisible: bool = True) -> None:
+        print(f"Trying Elixir Calc with the following data: em {em_level} elixir {elixir_per_rewind} old {all_skills_old} "
+              f"new {all_skills_new} bs {include_boss_slayer}")
 
         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
@@ -1682,27 +1576,24 @@ class Formulas(commands.GroupCog, name="calc"):
             await interaction.followup.send(embed=embed)
         else:
             embed = discord.Embed(title="", color=0x71368a)
-            embed.add_field(
-                name=f"Invalid data or 30s have passed, please try again. Long tap/copy the command you just used if you want "
-                     "to make any adjustments!",
-                value=f'/calc optimal_rewind em_level: {em_level} elixir_per_rewind: {elixir_per_rewind} '
-                      f'all_skills_old: {all_skills_old} all_skills_new: {all_skills_new} '
-                      f'include_boss_slayer: {include_boss_slayer} invisible: {invisible}'
-                , inline=False)
+            embed.add_field(name=f"Invalid data or 30s have passed, please try again. Long tap/copy the command you just used if you want "
+                                 "to make any adjustments!",
+                            value=f'/calc optimal_rewind em_level: {em_level} elixir_per_rewind: {elixir_per_rewind} '
+                                  f'all_skills_old: {all_skills_old} all_skills_new: {all_skills_new} '
+                                  f'include_boss_slayer: {include_boss_slayer} invisible: {invisible}'
+                            , inline=False)
             embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                              icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
             await interaction.followup.send(embed=embed, ephemeral=True)
 
         print("Done w/ Elixir calc")
 
-        await update_wrapped_data("optimal_rewind", em_level, elixir_per_rewind, all_skills_old, all_skills_new,
-                                  include_boss_slayer, invisible, username=interaction.user.name,
-                                  user_id=interaction.user.id)
+        await update_wrapped_data("optimal_rewind", em_level, elixir_per_rewind, all_skills_old, all_skills_new, include_boss_slayer, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
 
-    @app_commands.command(name="nextmobs",
-                          description="Input your current day, the range you want to look up for and get the next mobs")
+    @app_commands.command(name="nextmobs", description="Input your current day, the range you want to look up for and get the next mobs")
     @app_commands.describe(starting_day="The starting day for the calculation")
-    @app_commands.describe(how_many="How many days above the starting day you want to calculate for")
+    @app_commands.describe(how_many="How many days above the starting day you want to calculate for. Max 200 days")
     @app_commands.choices(filter_by=[
         discord.app_commands.Choice(name="All", value=0),
         discord.app_commands.Choice(name="Dino", value=1),
@@ -1715,10 +1606,8 @@ class Formulas(commands.GroupCog, name="calc"):
         discord.app_commands.Choice(name="Warmonger", value=8),
         discord.app_commands.Choice(name="Banshee", value=9)
     ])
-    async def mob_data_f(self, interaction: discord.Interaction, starting_day: int, how_many: int,
-                         filter_by: discord.app_commands.Choice[int], invisible: bool = True) -> None:
-        print(
-            f"Trying Mob Data with the following data: starting {starting_day} how many {how_many} filter by {filter_by.value}")
+    async def mob_data_f(self, interaction: discord.Interaction, starting_day: int, how_many: int, filter_by: discord.app_commands.Choice[int], invisible: bool = True) -> None:
+        print(f"Trying Mob Data with the following data: starting {starting_day} how many {how_many} filter by {filter_by.value}")
 
         embed = mob_data(starting_day, how_many, filter_by.value)
 
@@ -1730,10 +1619,9 @@ class Formulas(commands.GroupCog, name="calc"):
             await interaction.response.send_message(embed=embed)
 
         print("Done w/ Mob Data")
-        await update_wrapped_data("mob_data", starting_day, how_many, filter_by.value, invisible,
-                                  username=interaction.user.name,
-                                  user_id=interaction.user.id)
-
+        await update_wrapped_data("mob_data", starting_day, how_many, filter_by.value, invisible, username=interaction.user.name,
+                            user_id=interaction.user.id)
+        
     # @app_commands.command(name="dungeon_gold",
     #                       description="Input your dungeon data to receive the best way to spend your keys")
     # @app_commands.describe(crit_dmg_stat_level="Stat Menu -> Crit DMG Stat info button -> Blue number. NOT the percentage value, but the level")
@@ -1803,7 +1691,6 @@ class Formulas(commands.GroupCog, name="calc"):
     #     else:
     #         await interaction.response.send_message(embed=embed)
     #     print("Done w/ ToT")
-
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Formulas(bot))

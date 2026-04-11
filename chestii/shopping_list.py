@@ -49,4 +49,4 @@ class ShoppingList(commands.Cog):
         await interaction.response.send_message(content="ceva placeholder", view=AddButton())
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(ShoppingList(bot), guild=discord.Object(id=993818190008287283))
+    await bot.add_cog(ShoppingList(bot), guild=discord.Object(id=1030490217855074304))

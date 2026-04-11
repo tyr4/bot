@@ -1,4 +1,5 @@
 import time
+import pathlib
 
 import discord
 from discord.ext import commands, tasks
@@ -16,8 +17,10 @@ from google.oauth2.service_account import Credentials
 
 from chestii import jail
 from chestii.wrapped import update_wrapped_data
+from chestii.sheet import get_event_week_data
 
 log_ok = 0
+kuru_lock = asyncio.Lock()
 
 with open('raids_list.json', 'r+') as json_file:
     raids_list = json.load(json_file)
@@ -50,17 +53,17 @@ def rateup_embed():
     normal_rateup_emotes = [
         "<:Hero_Nero:1216982822665977946>",
         "<:Hero_Merlin:703020597755510824>",
-        "<:Hero_Lilith:703020228984045618>",
+        "<:Hero_Lilith:1487965100043403374>",
         "<:Hero_Dewitt:703020422005915658>",
         "<:Hero_Dash:703020475647000708>",
         "<:Hero_DarkMerlin:703020537089097789>",
         "<:Hero_Cain:711652423172882442>",
         "<:Hero_Elden:703020676323475536>",
-        "<:Hero_KingArthur:703033728061931600>",
+        "<:Hero_KingArthur:1470568923073351914>",
         "<:Hero_Luna:703033646172602508>",
         "<:Hero_Mikhail:703033570402238495>",
-        "<:Hero_Lilibeth:703020163158769785>",
-        "<:Hero_Clarissa:703021406270783573>",
+        "<:Hero_Lilibeth:1487965050680512562>",
+        "<:Hero_Clarissa:1487965135858569256>",
         "<:Hero_Roland:742795363739762778>"
     ]
     normal_rateup_names = ['Nero', 'Merlin', 'Lilith', 'Dewitt', 'Dash', 'Dark Merlin', 'Cain', 'Elden', 'King Arthur',
@@ -74,11 +77,19 @@ def rateup_embed():
     ]
     fates_rateup_names = ['Joan of Arc', 'Iseria', 'Zeus', 'Boreas']
 
+    dark_rateup_emotes = [
+        "<:Hero_Abel:1205212780769185792>",
+        "<:Hero_Bellona:1367087087609839677>",
+        "<:Hero_DaryonDevilkin:1487823751423725721>"
+    ]
+    dark_rateup_names = ["Abel", "Bellona", "Daryon Devilkin"]
+
     zile_luni, curr_rateup = [], 0
     # DOAR ASTEA 3 CONTEAZA, NU CORESPUND CU INDICII DIN LISTE (DECAT CU -2 SAU CEVA)
     curr_normal_rateup = 7
     curr_clairvoyance_rateup = 0
     curr_fates_rateup = 3
+    curr_dark_rateup = 0
 
     # ASTEA NU CONTEAZA
     next_normal_rateup = 0
@@ -87,10 +98,12 @@ def rateup_embed():
 
     while start_date <= end_date:
         if start_date.weekday() == 0:
-            curr_normal_rateup = (curr_normal_rateup + 1) % 14
-            curr_clairvoyance_rateup = (curr_clairvoyance_rateup + 1) % 14
-            curr_fates_rateup = (curr_fates_rateup + 1) % 4
-            temp = [start_date, curr_normal_rateup, curr_clairvoyance_rateup, curr_fates_rateup]
+            curr_normal_rateup = (curr_normal_rateup + 1) % len(normal_rateup_emotes)
+            curr_clairvoyance_rateup = (curr_clairvoyance_rateup + 1) % len(normal_rateup_emotes)
+            curr_fates_rateup = (curr_fates_rateup + 1) % len(fates_rateup_emotes)
+            curr_dark_rateup = (curr_dark_rateup + 1) % len(dark_rateup_emotes)
+            
+            temp = [start_date, curr_normal_rateup, curr_clairvoyance_rateup, curr_fates_rateup, curr_dark_rateup]
             zile_luni.append(temp)
         start_date += datetime.timedelta(days=1)
 
@@ -102,29 +115,40 @@ def rateup_embed():
             curr_normal_rateup = monday[1]
             curr_clairvoyance_rateup = monday[2]
             curr_fates_rateup = monday[3]
+            curr_dark_rateup = monday[4]
         else:
             next_rateup = monday[0].timestamp()
             next_normal_rateup = monday[1]
             next_clairvoyance_rateup = monday[2]
             next_fates_rateup = monday[3]
+            next_dark_rateup = monday[4]
             break
-
+    
+    
     embed = discord.Embed(title='Hero Rate-up Rotation', color=0x71368a)
     embed.add_field(name='Tickets Rate-up',
                     value=f'{normal_rateup_emotes[curr_normal_rateup]} {normal_rateup_names[curr_normal_rateup]}'
                           f' (next {normal_rateup_emotes[next_normal_rateup]} {normal_rateup_names[next_normal_rateup]})',
                     inline=False)
+
     embed.add_field(name='Fates/Totem of Clairvoyance Rate-ups',
                     value=f'{fates_rateup_emotes[curr_fates_rateup]} {fates_rateup_names[curr_fates_rateup]}'
                           f' (next {fates_rateup_emotes[next_fates_rateup]} {fates_rateup_names[next_fates_rateup]})\n'
                           f'{normal_rateup_emotes[curr_clairvoyance_rateup]} {normal_rateup_names[curr_clairvoyance_rateup]}'
                           f' (next {normal_rateup_emotes[next_clairvoyance_rateup]} {normal_rateup_names[next_clairvoyance_rateup]})',
                     inline=False)
+
+    embed.add_field(name='Dark Rate-up',
+                value=f'{dark_rateup_emotes[curr_dark_rateup]} {dark_rateup_names[curr_dark_rateup]}'
+                        f' (next {dark_rateup_emotes[next_dark_rateup]} {dark_rateup_names[next_dark_rateup]})',
+                inline=False)
+
     embed.add_field(name='', value=f'Next rate-up is <t:{next_rateup:.0f}:R>', inline=False)
 
     embed.set_image(
-        url='https://media.discordapp.net/attachments/719614236745007315/1453043674643562538/rateup_boreas.png?ex=694c03e0&is=694ab260&hm=8079db31235cf2ae2b4e7fe39d6aa584285c95ef5e91b7c5bd4b7b4c804db750&=&quality=lossless')
+        url='https://media.discordapp.net/attachments/1141499425722740756/1488176510618702074/image.png?ex=69cbd3e1&is=69ca8261&hm=db600143eb390d80a41dae252158b4980b0540d36b6ccb9466fbd4c4851c8fe1&=&quality=lossless')
 
+    print("embed fraere")
     return embed
 
 
@@ -166,12 +190,42 @@ def dump_all_info_alpha_sheet(text_matrix):
 
 # sheet, worksheet = init_sheet()
 
+def load_kuru_data():
+    kuru_data = {}
 
-def update(user_id: str, name, mode):
-    with open('data.json', 'r+') as json_file:
-        data = json.load(json_file)
+    with open('data.json', 'r') as json_file:
+        kuru_data = json.load(json_file)
+
+    return kuru_data
+
+def save_kuru_data(kuru_data):
+    path = pathlib.Path("data.json")
+    tmp = path.with_suffix(".tmp")
+
+    with tmp.open("w") as f:
+        f.seek(0)
+        json.dump(kuru_data, f, indent=4)
+
+    tmp.replace(path)
+
+async def update(user_id: str, name, mode):
+    async with kuru_lock:
+        data = load_kuru_data()
+
         if user_id not in data:
-            data[user_id] = {"kurureact1": 0, "kurureact2": 0, "kuruemote": 0, "kurugif": 0, "name": name}
+            data[user_id] = {"kurureact1": 0, "kurureact2": 0, "kuruemote": 0, "kurugif": 0, "dancyreply": 0, "dancygif": 0, "dancyspam": 0, "dancybread": 0, "name": name}
+        
+        if "dancyreply" not in data[user_id]:
+                data[user_id]['dancyreply'] = 0
+        
+        if "dancygif" not in data[user_id]:
+                data[user_id]['dancygif'] = 0
+
+        if "dancyspam" not in data[user_id]:
+                data[user_id]['dancyspam'] = 0
+
+        if "dancybread" not in data[user_id]:
+                data[user_id]['dancybread'] = 0
 
         if mode == 1:
             data[user_id]['kurureact1'] += 1
@@ -182,8 +236,18 @@ def update(user_id: str, name, mode):
         elif mode == 4:
             data[user_id]['kurugif'] += 1
 
-        json_file.seek(0)
-        json.dump(data, json_file, indent=4)
+        elif mode == 5:
+            data[user_id]['dancyreply'] += 1
+        elif mode == 6:
+            data[user_id]['dancygif'] += 1
+        elif mode == 7:
+            data[user_id]['dancyspam'] += 1
+        elif mode == 8:
+            data[user_id]['dancybread'] += 1
+
+        data[user_id]["name"] = name
+        
+        save_kuru_data(data)
 
 
 embed_message_general = None
@@ -257,6 +321,43 @@ class Funni(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        if payload.guild_id == 570929677732937738:
+            guild = await self.bot.fetch_guild(payload.guild_id)
+            channel = await guild.fetch_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+
+            hasCrocodile, hasSaxophone = False, False
+            hasEagle, hasAmerica = False, False
+
+            for reaction in message.reactions:
+                emoji = str(reaction.emoji)        # str or Emoji
+                count = reaction.count
+                me = reaction.me              # did the bot react?
+
+                if "🐊" in emoji or "crocodile" in emoji:
+                    hasCrocodile = True
+                
+                if "🎷" in emoji or "saxophone" in emoji:
+                    hasSaxophone = True
+
+                if "🦅" in emoji:
+                    hasEagle = True
+                
+                if "🇺🇸" in emoji:
+                    hasAmerica = True
+
+                print(f"Emoji: {emoji} | Count: {count} | Bot reacted: {me}")
+            
+            if hasCrocodile and hasSaxophone:
+                print(payload.user_id)
+                user = await self.bot.fetch_user(payload.user_id)
+                await user.send("🇫🇷")
+                print(f"sent french to {user.display_name}")
+            
+            if hasAmerica and hasEagle:
+                user = await self.bot.fetch_user(payload.user_id)
+                await user.send("🍔")
+
         if payload.guild_id == 570929677732937738 and payload.user_id in [1174101270471114864, 685600652633964603,
                                                                           1381989758418419805]:
             await asyncio.sleep(5)
@@ -278,21 +379,26 @@ class Funni(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def kuro(self, ctx, *, arg):
-        user = self.bot.get_user(313208643824910336)
+        user = self.bot.get_user(556836294710525952)
         await user.send(arg)
         print('am primit')
 
+    
     @commands.command()
-    async def muefishy(self, ctx):
-        server = self.bot.get_guild(1134464290477330432)
-        role = server.get_role(1134464290708013200)
-        member = server.get_member(556836294710525952)  # <-- use get_member, not get_user
+    @commands.has_permissions(administrator=True)
+    async def gala(self, ctx):
+        user = await self.bot.fetch_user(313692765429170177)
+        dm = await user.create_dm()
 
-        if member is None:
-            # If the member isn’t cached, fetch them
-            member = await server.fetch_member(556836294710525952)
-
-        await member.add_roles(role)
+        async for message in dm.history(limit=9999):
+            print(
+                message.author.id,
+                message.content,
+                message.created_at
+            )
+            if message.attachments:
+                for attachment in message.attachments:
+                    print(attachment.url)
 
     @commands.command()
     async def ask(self, ctx):
@@ -366,10 +472,10 @@ class Funni(commands.Cog):
             return
 
         try:
-            if message.guild.id in [1030490217855074304, 570929677732937738, 748126143584141332, 1134464290477330432]:
+            if message.guild.id in [1030490217855074304, 570929677732937738, 748126143584141332, 1134464290477330432, 1412320952678613043]:
                 print(f"{message.author} imparte intelepciune: '{message.content}', #{message.channel}")
         except Exception as e:
-            print(e)
+            print(f"{message.author} imparte intelepciune: '{message.content}' DM")
 
         masaj = re.findall(r'\w+', str(message.content.lower()))
         try:
@@ -402,8 +508,20 @@ class Funni(commands.Cog):
 
             z = randint(1, 1000)
             zplus = randint(1, 10000)
-            kurukuru_jackpo = randint(1, 100000)
+            kurukuru_jackpo = randint(1, 100_000)
             kurukuru2 = 0
+            dancyreply = randint(1, 5000)
+            dancygif = randint(1, 50_000)
+            dancyspam = randint(1, 500_000)
+            dancybread = randint(1, 1_000_000)
+
+            if (message.author.id == 556836294710525952 and str(message.content).lower() == "hmm i think im gonna get a bread now."):
+                kurukuru_jackpo = 100000
+
+            if message.author.id == 977660878080057344:
+                dancyspam = 0
+                dancybread = 0
+
             if "the" in masaj and "man" in masaj and message.author.id in [556836294710525952, 278798822937853953]:
                 if masaj.index("the") < masaj.index("man"):
                     await message.channel.send("Dave the man <:LETSFUCKINGGOO:1286739473085759519>", reference=message,
@@ -412,7 +530,7 @@ class Funni(commands.Cog):
             if message.channel.id not in [1367130635801722972]:
                 if z == 1000 or str(message.channel) == "amogus-testing" and message.channel.id:
                     await message.add_reaction("<a:kurukuru:1113242215083421707>")
-                    update(str(message.author.id), str(message.author), 1)
+                    await update(str(message.author.id), str(message.author), 1)
                     kurukuru2 = randint(1, 5)
                     if kurukuru2 == 5 or str(message.channel) == "amogus-testing":
                         await message.add_reaction("<a:kurukuru2:1139252590278889529>")
@@ -425,18 +543,35 @@ class Funni(commands.Cog):
                         else:
                             await message.reply("https://tenor.com/view/kuru-kuru-gif-10882574602170874277",
                                                 mention_author=False)
-                            update(str(message.author.id), str(message.author), 4)
+                            
+                            await update(str(message.author.id), str(message.author), 4)
 
                     if zplus == 10000 or str(message.channel) == "amogus":
                         await message.reply("<a:kurukuru:1113242215083421707>", mention_author=False)
-                        update(str(message.author.id), str(message.author), 3)
+                        await update(str(message.author.id), str(message.author), 3)
 
-                if zplus == 10000 or kurukuru_jackpo == 100000 or z == 1000:
+                    if dancyreply == 5000 or str(message.channel) == "amogus":
+                        await message.reply("<a:dancy:1461348000977653760>", mention_author=False)
+                        await update(str(message.author.id), str(message.author), 5)
+                    
+                    if dancygif == 50_000 or str(message.channel) == "amogus":
+                        await message.reply("https://cdn.discordapp.com/emojis/1458461038889664523.gif?size=1024", mention_author=False)
+                        await update(str(message.author.id), str(message.author), 6)
+
+                    if dancyspam == 500_000 or str(message.channel) == "amogus":
+                        await message.reply(f"{'<a:dancy:1461348000977653760>' * 10}", mention_author=False)
+                        await update(str(message.author.id), str(message.author), 7)
+
+                    if dancybread == 1_000_000 or str(message.channel) == "amogus":
+                        await message.reply(f"{'<a:dancy:1461348000977653760>' * 10}", file=discord.File("kuru-kuru.gif"), mention_author=False)
+                        await update(str(message.author.id), str(message.author), 8)
+
+
+                if zplus == 10000 or kurukuru_jackpo == 100000 or z == 1000 or dancyreply == 5000 or dancygif == 50_000 or dancyspam == 500_000 or dancybread == 1_000_000:
                     chanel = self.bot.get_channel(1224041578407002153)
                     await chanel.send(file=discord.File("data.json"))
 
                     await update_wrapped_data("kurukuru", z == 1000, kurukuru2 == 5, zplus == 10000, kurukuru_jackpo == 100000, username=str(message.author), user_id=message.author.id)
-
                     chanel = self.bot.get_channel(1456699085422727402)
                     await chanel.send(file=discord.File("wrapped.json"))
 
@@ -454,6 +589,10 @@ class Funni(commands.Cog):
             if "furismug" in message.content.lower():
                 if randint(1, 10) == 10:
                     await message.add_reaction("<:furismug:1272514766757433374>")
+            
+            if "dancy" in message.content.lower() and message.author.id != 954082451762847746:
+                if randint(1, 10) == 10:
+                    await message.add_reaction("<:dancy:1461348000977653760>")
 
             if "pettheevl" in message.content.lower():
                 if randint(1, 10) == 10:
@@ -476,19 +615,65 @@ class Funni(commands.Cog):
                     f"An updated evl for players at 0-36k like <@553194887701331969> and me: [THE NEW EVL](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
                     "If you only want to use the command for yourself, you can use it in <#699337693238263900> or find the link in <#637933543699513367>")
                 await update_wrapped_data("?evl", username=message.author.name, user_id=message.author.id)
+            
+            if "?cyber" in message.content.lower():
+                await message.reply(f"DBG Site with most sheets/formulas: https://dbg-calculator.vercel.app", mention_author=False)
+                await update_wrapped_data("?cyber", username=message.author.name, user_id=message.author.id)
 
             if "?rateup" in message.content.lower():
+                print("am intrat")
+                embed = rateup_embed()
+                print("am embed fraere", embed)
+
+                embed.set_image(url=None)
+
                 await message.reply(
-                    "Weekly Hero Rate-up: https://discord.com/channels/570929677732937738/570929677732937740/1369768813272371210",
-                    mention_author=False)
+                    f"Weekly Hero Rate-up: https://discord.com/channels/570929677732937738/570929677732937740/1369768813272371210",
+                    mention_author=False, embed=embed)
+
                 await update_wrapped_data("?rateup", username=message.author.name, user_id=message.author.id)
+            
+            if "?events" in message.content.lower():
+                embed = get_event_week_data()
+                
+                await message.reply(mention_author=False, embed=embed)
+                await update_wrapped_data("?events", username=message.author.name, user_id=message.author.id)
 
             if "?halloween" in message.content.lower():
                 await message.reply(
                     "Halloween Event Boss Team: <:Hero_DarkMerlin:703020537089097789> <:Hero_Mikhail:703033570402238495> <:Hero_Max:703017718835838997> <:Hero_Dewitt:703020422005915658> <:Hero_Saul:977594194988236861> <:Hero_Garp:729434017296023675> (decent for all difficulties)\n" \
                     "For Insane, 15* <:Hero_DarkMerlin:703020537089097789> is required", mention_author=False)
                 await update_wrapped_data("?halloween", username=message.author.name, user_id=message.author.id)
+            
+            if "?mammoths" in message.content.lower():
+                await message.reply("https://tenor.com/view/woolly-mammoth-aio-ai-video-gif-2546557529878141509", mention_author=False)
+                await update_wrapped_data("?mammoths", username=message.author.name, user_id=message.author.id)
+            
+            if ("🐊" in message.content.lower() and "🎷" in message.content.lower()) or ("crocodile" in message.content.lower() and "saxophone" in message.content.lower()):
+                user = await self.bot.fetch_user(message.author.id)
+                print(f"sent french to {user.display_name}")
+                await user.send("🇫🇷")
+            
+            if "🦅" in message.content.lower() and "🇺🇸" in message.content.lower():
+                user = await self.bot.fetch_user(message.author.id)
+                await user.send("🍔")
 
+            # numar = randint(1, 50)
+            # numar2 = randint(1, 5)
+            # user = await self.bot.fetch_user(977660878080057344)
+
+            # if numar2 == 1:
+            #     await user.send(f"{'🇫🇷' * numar}")
+            # elif numar2 == 2:
+            #     await user.send(f"{'🇷🇴' * numar}")
+            # elif numar2 == 3:
+            #     await user.send(f"{'<a:dancy:1461348000977653760>' * numar}")
+            # elif numar2 == 4:
+            #     await user.send(f"{'<a:kurukuru:1113242215083421707>' * numar}")
+            # elif numar2 == 5:
+            #     await user.send(f"{'https://media.discordapp.net/attachments/728112209972166718/998669686554251394/image0-1.gif ' * max(1, numar // 5)}")
+
+                
             exclusion_list = [696035168414072913, 1069249122428780636, 637388798396858379]
             parent_id = None
             try:
@@ -527,7 +712,7 @@ class Funni(commands.Cog):
             #         chanel = self.bot.get_channel(1224041578407002153)
             #         await chanel.send(file=discord.File('update_list.json'))
 
-        elif message.guild.id in [993818190008287283, 1134464290477330432, 1030490217855074304]:
+        elif message.guild.id in [993818190008287283, 1134464290477330432, 1030490217855074304, 1412320952678613043]:
             global jailtime
             x = randint(1, 500)
             #
@@ -623,7 +808,7 @@ class Funni(commands.Cog):
                          "Somewhere out there is a tree tirelessly producing oxygen for you. You owe it an apology.",
                          "That sounds like a you problem.",
                          "You have miles to go before you reach mediocre."]
-                if message.guild.id == 1134464290477330432:
+                if message.guild.id == 1412320952678613043:
                     Dave_quotes = ["Dave can divide by zero.",
                                    "Dave counted to infinity. Twice.",
                                    "When Dave enters a room, he doesn't turn the lights on; he turns the dark off.",
