@@ -486,4 +486,4 @@ class PlayAgain(discord.ui.View):
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(Blackjack(bot), guild=discord.Object(id=1134464290477330432))
+    await bot.add_cog(Blackjack(bot), guild=discord.Object(id=1412320952678613043))

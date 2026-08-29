@@ -44,7 +44,7 @@ class ShoppingList(commands.Cog):
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(name="init", description="init message")
+    @app_commands.command(name="numedecacat", description="description de cacat")
     async def init_shopping_list(self, interaction: discord.Interaction):
         await interaction.response.send_message(content="ceva placeholder", view=AddButton())
 

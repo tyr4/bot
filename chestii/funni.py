@@ -1,4 +1,3 @@
-import time
 import pathlib
 
 import discord
@@ -7,17 +6,11 @@ from random import randint
 import asyncio
 import re
 import datetime
-import pytz
 import json
-from discord import Permissions
-import aiohttp
 
-import gspread
-from google.oauth2.service_account import Credentials
-
-from chestii import jail
 from chestii.wrapped import update_wrapped_data
 from chestii.sheet import get_event_week_data
+from chestii.void_deals import build_embed_today_deals
 
 log_ok = 0
 kuru_lock = asyncio.Lock()
@@ -27,7 +20,6 @@ with open('raids_list.json', 'r+') as json_file:
 
 with open('update_list.json', 'r+') as json_file:
     update_list = json.load(json_file)
-
 
 async def update_update_list(user_id: int, update_list):
     with open('update_list.json', 'r+') as json_file:
@@ -152,24 +144,24 @@ def rateup_embed():
     return embed
 
 
-def init_sheet():
-    # Path to your service account key file
-    SERVICE_ACCOUNT_FILE = 'google_sheets_api_key.json'
-
-    # Define the scope
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-
-    # Authenticate using the service account key
-    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-
-    # Use gspread to access the Google Sheets API
-    gc = gspread.authorize(creds)
-
-    # Open the Google Sheet by its title or URL
-    sheet = gc.open_by_key("1cq3kCdWNpyiOA_XKiUPi62XyspexsgyIP48yMkGmEqM")
-    worksheet = sheet.worksheet('Sheet1')
-
-    return sheet, worksheet
+# def init_sheet():
+#     # Path to your service account key file
+#     SERVICE_ACCOUNT_FILE = 'google_sheets_api_key.json'
+#
+#     # Define the scope
+#     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+#
+#     # Authenticate using the service account key
+#     creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+#
+#     # Use gspread to access the Google Sheets API
+#     gc = gspread.authorize(creds)
+#
+#     # Open the Google Sheet by its title or URL
+#     sheet = gc.open_by_key("1cq3kCdWNpyiOA_XKiUPi62XyspexsgyIP48yMkGmEqM")
+#     worksheet = sheet.worksheet('Sheet1')
+#
+#     return sheet, worksheet
 
 
 def filter_application_text(text_input):
@@ -181,14 +173,6 @@ def filter_application_text(text_input):
         text_input[i] = text_input[i][(index + 1 if index != -1 else 0):].lstrip()
 
     return text_input
-
-
-def dump_all_info_alpha_sheet(text_matrix):
-    # append all rows in one go
-    worksheet.append_rows(text_matrix, value_input_option="RAW")
-    print(f"Appended {len(text_matrix)} rows")
-
-# sheet, worksheet = init_sheet()
 
 def load_kuru_data():
     kuru_data = {}
@@ -383,7 +367,6 @@ class Funni(commands.Cog):
         await user.send(arg)
         print('am primit')
 
-    
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def gala(self, ctx):
@@ -419,43 +402,28 @@ class Funni(commands.Cog):
             else:
                 await ctx.reply("<a:NoNoNoNoNo:1279088570350571673>", mention_author=False)
 
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def bobert(self, ctd):
-        date = pytz.timezone("Europe/Bucharest").localize(datetime.datetime(2025, 2, 9, 23, 0))
-        channel = self.bot.get_channel(1134464291924361249)
-        dictionary = {}
-        async for message in channel.history(limit=None, after=date):
-            try:
-                if dictionary[f'{message.author.id}']:
-                    dictionary[f"{message.author.id}"] += 1
-            except:
-                dictionary[f"{message.author.id}"] = 1
-
-        await channel.send(dictionary)
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def alpha_history(self, ctx, channel_id):
-        data = datetime.datetime(2025, 8, 20, tzinfo=pytz.utc)
-        channel = self.bot.get_channel(int(channel_id))
-        counter = 0
-        start = time.time()
-        matrix = []
-
-        async for message in channel.history(limit=None, after=data):
-            if message.author.id == 151495292418654210:
-                continue
-
-            counter += 1
-            filtered_text = [message.author.display_name, message.author.name, message.created_at.strftime("%Y-%m-%d %H:%M:%S"), str(message.author.id), str(message.content)]
-            matrix.append(filtered_text)
-            print(filtered_text)
-
-        dump_all_info_alpha_sheet(matrix)
-
-        end = time.time()
-        await ctx.reply(f"{counter} messages found in <#{1102311924735168517}> in {format(end - start, '.2f')}s!")
+    # @commands.command()
+    # @commands.has_permissions(administrator=True)
+    # async def alpha_history(self, ctx, channel_id):
+    #     data = datetime.datetime(2025, 8, 20, tzinfo=pytz.utc)
+    #     channel = self.bot.get_channel(int(channel_id))
+    #     counter = 0
+    #     start = time.time()
+    #     matrix = []
+    #
+    #     async for message in channel.history(limit=None, after=data):
+    #         if message.author.id == 151495292418654210:
+    #             continue
+    #
+    #         counter += 1
+    #         filtered_text = [message.author.display_name, message.author.name, message.created_at.strftime("%Y-%m-%d %H:%M:%S"), str(message.author.id), str(message.content)]
+    #         matrix.append(filtered_text)
+    #         print(filtered_text)
+    #
+    #     dump_all_info_alpha_sheet(matrix)
+    #
+    #     end = time.time()
+    #     await ctx.reply(f"{counter} messages found in <#{1102311924735168517}> in {format(end - start, '.2f')}s!")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -483,24 +451,28 @@ class Funni(commands.Cog):
         except:
             name = ""
 
-        if message.guild.id in [570929677732937738, 993818190008287283]:
-            if message.channel.id == 1409634645682684077:
-                filtered_text = filter_application_text(str(message.content))
-                update_alpha_sheet(message.author.display_name, message.author.name, message.author.id, filtered_text)
-
+        if message.guild.id in [570929677732937738, 993818190008287283, 1507129472682426459]:
             if message.attachments and not message.author.bot and message.guild.id == 570929677732937738:
                 canal = self.bot.get_channel(1352323971860795393)
                 await canal.send(f'# {message.author} {message.author.id} #{message.channel}\n'
                                  f'"`{message.content}`"')
-                await asyncio.sleep(20)
-
+                # await asyncio.sleep(20)
                 for attachment in message.attachments:
-                    get_file_format = lambda url: f".{url.split('/')[-1].split('?')[0].split('.')[-1]}" if '.' in \
-                                                                                                           url.split(
-                                                                                                               '/')[
-                                                                                                               -1] else None
+                    get_file_format = lambda url: f".{url.split('/')[-1].split('?')[0].split('.')[-1]}" if '.' in url.split('/')[-1] else None
+
                     print(get_file_format(attachment.url))
-                    await attachment.save(f'image{get_file_format(attachment.url)}')
+                    path = f"image{get_file_format(attachment.url)}"
+                    await attachment.save(path)
+
+                    # send the void deals if its a valid image
+                    # try:
+                    #     if ".png" in path or ".jpg" in path: 
+                    #         void_data = await run_void_deals_ocr(path)
+                    #         if void_data is not None:
+                    #             await message.reply(embed=void_data, mention_author=False)
+                    # except:
+                    #     print("nu se poate")
+
                     await canal.send(f"Sent by {message.author} {message.author.id}",
                                      file=discord.File(f'image{get_file_format(attachment.url)}'))
                     print(attachment.url)
@@ -620,6 +592,21 @@ class Funni(commands.Cog):
                 await message.reply(f"DBG Site with most sheets/formulas: https://dbg-calculator.vercel.app", mention_author=False)
                 await update_wrapped_data("?cyber", username=message.author.name, user_id=message.author.id)
 
+            if "?tyr" in message.content.lower():
+                await message.reply(
+                    "Updated Optimal Rewind Calculator with stats calculations: <https://docs.google.com/spreadsheets/d/1ChZHbUy914-4r9vvcjviKCUfBqnJKiUvpnsG321XoWM/edit?gid=0#gid=0>",
+                    mention_author=False)
+                await update_wrapped_data("?tyr", username=message.author.name, user_id=message.author.id)
+
+            if "?death" in message.content.lower():
+                await message.channel.send("<@674287880981708821> Hi hi hello")
+
+                await asyncio.sleep(6)
+
+                await message.channel.send("<@674287880981708821> Once more for good measure")
+
+                await update_wrapped_data("?death", username=message.author.name, user_id=message.author.id)
+
             if "?rateup" in message.content.lower():
                 print("am intrat")
                 embed = rateup_embed()
@@ -632,12 +619,26 @@ class Funni(commands.Cog):
                     mention_author=False, embed=embed)
 
                 await update_wrapped_data("?rateup", username=message.author.name, user_id=message.author.id)
+
+            if "?darksheet" in message.content.lower():
+                await message.reply(
+                    "You can find all Dark Tome buff values and costs here: <https://docs.google.com/spreadsheets/d/1Q1c3qUT74m3kT6ePJOm-Nib05v7I1Ua5AB9XdKn6HME/edit?gid=0#gid=0>", mention_author=False)
+                await update_wrapped_data("?darksheet", username=message.author.name, user_id=message.author.id)
             
             if "?events" in message.content.lower():
                 embed = get_event_week_data()
                 
                 await message.reply(mention_author=False, embed=embed)
                 await update_wrapped_data("?events", username=message.author.name, user_id=message.author.id)
+
+            if "?wtcalc" in message.content.lower():
+                text = "<:WT_Apple:1019750592001867867> **[World Tree Calculator](<https://docs.google.com/spreadsheets/d/1A-J5gifZtwgBL1_WzR9eXIM4InxccwyIc5f998ZPKXM/edit?gid=548764124#gid=548764124>)** <:WT_Apple:1019750592001867867>  /  *[[Alternative Calc in Browser]](https://dbg-calculator.vercel.app/pages/worldtree.html)*\n" \
+                "Use this to figure out where to invest your apples for the most optimal days of damage & Monarch's WT Planner to plan out your next World Tree Build! \n" \
+                "(short guide on how to use it here: https://discord.com/channels/570929677732937738/1191279847427817482/1458890737193193688) \n" \
+                "-# Don't forget you have to make a copy! If you're on phone, you have to download the Google Sheets app"
+
+                await message.reply(text, mention_author=False)
+                await update_wrapped_data("?wtcalc", username=message.author.name, user_id=message.author.id)
 
             if "?halloween" in message.content.lower():
                 await message.reply(
@@ -646,8 +647,9 @@ class Funni(commands.Cog):
                 await update_wrapped_data("?halloween", username=message.author.name, user_id=message.author.id)
             
             if "?mammoths" in message.content.lower():
-                await message.reply("https://tenor.com/view/woolly-mammoth-aio-ai-video-gif-2546557529878141509", mention_author=False)
-                await update_wrapped_data("?mammoths", username=message.author.name, user_id=message.author.id)
+                if message.author.id != 954082451762847746:
+                    await message.reply("https://tenor.com/view/woolly-mammoth-aio-ai-vi!deo-gif-2546557529878141509", mention_author=False)
+                    await update_wrapped_data("?mammoths", username=message.author.name, user_id=message.author.id)
             
             if ("🐊" in message.content.lower() and "🎷" in message.content.lower()) or ("crocodile" in message.content.lower() and "saxophone" in message.content.lower()):
                 user = await self.bot.fetch_user(message.author.id)
@@ -657,6 +659,12 @@ class Funni(commands.Cog):
             if "🦅" in message.content.lower() and "🇺🇸" in message.content.lower():
                 user = await self.bot.fetch_user(message.author.id)
                 await user.send("🍔")
+
+            if "?deals" in message.content.lower():
+                embed = build_embed_today_deals()
+                await message.reply(embed=embed, mention_author=False)
+
+                await update_wrapped_data("?deals", username=message.author.name, user_id=message.author.id)
 
             # numar = randint(1, 50)
             # numar2 = randint(1, 5)
@@ -734,7 +742,7 @@ class Funni(commands.Cog):
                 x = 0
             elif str(message.channel) == "amogus-testing":
                 x = 500
-            if x == 500:
+            if x == 501:
                 funni = [f"Haha how funny of you {name} <:keek:806077897584410685>", "Ong fr fr", "*silence*",
                          "<:pogFrog:802088916244234261>", "Just no <:pepe_flower:901873383212462091>", "YES", "ඞ",
                          f"{name} stinks", "Based", "Why?", "Are you sure?", "💀", "Please don't", "Please do",

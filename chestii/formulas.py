@@ -1265,10 +1265,15 @@ def damagetoday(damage: str, suffix: str, test_mode: bool):
     litera_max = ''
 
     try:
-        damage = float(damage)
+        if len(damage) < 7 or not (len(damage) > 5 and suffix == "zz"):
+            damage = float(damage)
+        else:
+            return 0
+
     except ValueError:
         print("valoare eroare")
         return 0
+
     if len(suffix) != 2:
         print("len")
         return 0
@@ -1307,6 +1312,9 @@ def damagetoday(damage: str, suffix: str, test_mode: bool):
     while day_damage <= damage:
         day += 1
         day_damage *= 1.066
+
+        if (day > 100000):
+            return 0
 
     embed = discord.Embed(title="Damage to Day Calculator <a:kafkakurukuru:1118233531110412461>",
                           color=0x71368a)
@@ -1466,7 +1474,7 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(days_to_look_ahead="Days you want to look ahead the starting day, for all spots within that range")
     async def spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
         print(f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel double")
-        if 50 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
+        if 50 <= days_to_look_ahead and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
             if double_rewind is True and starting_day < 10585:
                 await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
                 return
@@ -1525,7 +1533,7 @@ class Formulas(commands.GroupCog, name="calc"):
     async def best_spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True,
                            tj: bool = True, express: bool = True) -> None:
         print(f"Trying 'Best Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel")
-        if 100 <= days_to_look_ahead <= 500 and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
+        if 100 <= days_to_look_ahead and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
             if double_rewind is True and starting_day < 10585:
                 await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
                 return

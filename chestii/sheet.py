@@ -75,7 +75,11 @@ class Sheet(commands.Cog):
                    f"(short guide on how to use it here: https://discord.com/channels/570929677732937738/1191279847427817482/1191284734433706044 - don't forget to make a copy!)\n"
                    f"\nYou can also try out **[Cyber's site](<{cybers_site_link_wt}>)** for a better experience")
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
+
         await update_wrapped_data("wtcalc", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="ticketcalc", description="Sends a link to the Ticket sheet")
@@ -84,7 +88,10 @@ class Sheet(commands.Cog):
                    f"Use this calculator to figure out how many hero copies/tickets it would take to get legendary heroes to x* as well as calculate catalysts needed for ascensions/nodes and the Tome in Dark\n"
                    f"-# Don't forget to make a copy!")
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("ticketcalc", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="pushingcalc", description="Sends a link to N's Pushing sheet")
@@ -92,7 +99,10 @@ class Sheet(commands.Cog):
         message = (f"[Use this sheet to see how far in days you can push in the Campaign mode](<{pushing_sheet_link}>)\n"
                    f"*output will be a rough estimate")
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("pushingcalc", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="assets", description="Information about free in-game assets")
@@ -101,7 +111,10 @@ class Sheet(commands.Cog):
                    f"This is not plagiarism or anything of the sort, as many different games can purchase and use these sprites.\n"
                    f"This is the case for different mobs, heroes, as well as spell icons.")
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("assets", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="masterlist", description="Sends a link to the Sheet Master List")
@@ -109,7 +122,10 @@ class Sheet(commands.Cog):
         message = (f"**Master List of all community made sheets/calculators here:**\n"
                    f"<{masterlist_sheet_link}>")
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("masterlist", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="wiki", description="Sends a link to the official DBG Wiki")
@@ -117,36 +133,71 @@ class Sheet(commands.Cog):
         message = (f"**Official Days Bygone Wiki**\n"
                    f"<{wiki_link}>")
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("wiki", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="dancy", description="Sends a dancy")
     async def send_dancy(self, interaction: discord.Interaction):
         message = "<a:dancy:1461348000977653760>"
         
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("dancy", username=interaction.user.name, user_id=interaction.user.id)
     
     @app_commands.command(name="website", description="Sends a link to Cyber's website")
     async def send_website(self, interaction: discord.Interaction):
         message = f"DBG Site with most sheets/formulas: {cybers_site_link}"
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("website", username=interaction.user.name, user_id=interaction.user.id)
 
     @app_commands.command(name="darksheet", description="Sends a link to the Lost Chapter Costs sheet")
     async def send_dark_sheet(self, interaction: discord.Interaction):
         message = f"You can find all Dark Tome buff values and costs here: <{dark_sheet_link}>"
 
-        await interaction.response.send_message(message)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(message)
         await update_wrapped_data("darksheet", username=interaction.user.name, user_id=interaction.user.id)
     
     @app_commands.command(name="events", description="Sends the event schedule")
     async def send_events(self, interaction: discord.Interaction):
         embed = get_event_week_data()
 
-        await interaction.response.send_message(embed=embed)
+        if interaction.guild.id == 570929677732937738 and interaction.user.id == 1123936489303195660 and interaction.channel.id != 699337693238263900:
+            await interaction.response.send_message("<#699337693238263900> exists bro", ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
         await update_wrapped_data("events", username=interaction.user.name, user_id=interaction.user.id)
+
+    @app_commands.command(name="worldtreeactivity", description="Launch the World Tree Discord Activity")
+    async def worldtreeactivity(self, interaction: discord.Interaction):
+        try:
+            await interaction.response.launch_activity()
+        except Exception as error:
+            debug_log(f"/worldtreeactivity failed for user {interaction.user.id}: {type(error).__name__}: {error}")
+            if interaction.response.is_done():
+                await interaction.followup.send(
+                    "Couldn't launch the World Tree Activity.",
+                    ephemeral=True,
+                )
+            else:
+                await interaction.response.send_message(
+                    "Couldn't launch the World Tree Activity.",
+                    ephemeral=True,
+                )
+
+        await update_wrapped_data("worldtreeactivity", username=interaction.user.name, user_id=interaction.user.id)
+        
 
 
 async def setup(bot: commands.Bot) -> None:

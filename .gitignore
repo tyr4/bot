@@ -3,6 +3,8 @@ pet_frames/
 gear big/
 frames/
 chestii/__pycache__/
+deals_images/
+activities/
 *.json
 *.png
 *.gif
