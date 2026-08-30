@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 import discord
@@ -10,7 +11,7 @@ import json
 
 from chestii.wrapped import update_wrapped_data
 from chestii.sheet import get_event_week_data
-from chestii.void_deals import build_embed_today_deals
+from chestii.void_deals import build_embed_today_deals, should_send_deals_today, build_void_deals_ping
 
 log_ok = 0
 kuru_lock = asyncio.Lock()
@@ -238,11 +239,13 @@ embed_message_general = None
 general_channel = None
 help_channel = None
 embed_message_help = None
+void_plus_channel = None
 
 class Funni(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.check_embed.start()
+        self.check_rateup_embed.start()
+        self.check_void_deals_embed.start()
 
     @commands.command()
     # @commands.has_permissions(manage_messages=True)
@@ -254,7 +257,7 @@ class Funni(commands.Cog):
             await ctx.channel.send(embed=embed)
 
     @tasks.loop(seconds=60)
-    async def check_embed(self):
+    async def check_rateup_embed(self):
         global log_ok
         global general_channel
         global embed_message_general
@@ -272,14 +275,33 @@ class Funni(commands.Cog):
         #         await message.delete()
         #         await asyncio.sleep(1)
 
-    @check_embed.before_loop
-    async def before_check_embed(self):
+    @tasks.loop(seconds=60)
+    async def check_void_deals_embed(self):
+        global void_plus_channel
+
+        if should_send_deals_today():
+            embed = build_embed_today_deals()
+            pings = build_void_deals_ping()
+
+            await void_plus_channel.send(pings, embed=embed)
+
+    @check_void_deals_embed.before_loop
+    async def before_check_void_deals_embed(self):
+        global void_plus_channel
+
+        print("se asteapta void deals")
+        await self.bot.wait_until_ready()
+
+        void_plus_channel = await self.bot.fetch_channel(1102311924735168517)
+
+    @check_rateup_embed.before_loop
+    async def before_check_rateup_embed(self):
         global general_channel
         global embed_message_general
         global embed_message_help
         global help_channel
 
-        print("se asteapta")
+        print("se asteapta rateup")
         await self.bot.wait_until_ready()
         general_channel = await self.bot.fetch_channel(570929677732937740)
         help_channel = await self.bot.fetch_channel(696035168414072913)
@@ -475,6 +497,9 @@ class Funni(commands.Cog):
 
                     await canal.send(f"Sent by {message.author} {message.author.id}",
                                      file=discord.File(f'image{get_file_format(attachment.url)}'))
+
+                    os.remove(path)
+
                     print(attachment.url)
                     await asyncio.sleep(30)
 
