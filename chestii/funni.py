@@ -282,18 +282,18 @@ class Funni(commands.Cog):
         global void_plus_channel
 
         if should_send_deals_today():
-            embed = build_embed_today_deals()
+            embed, file = build_embed_today_deals()
             pings = build_void_deals_ping()
 
-            await void_plus_channel.send(pings, embed=embed)
+            await void_plus_channel.send(pings, embed=embed, file=file)
 
     @tasks.loop(seconds=8)
     async def check_void_deals_embed(self):
         global void_plus_channel
         global void_plus_message
 
-        embed = build_embed_pinned_message()
-        await void_plus_message.edit(embed=embed)
+        embed, file = build_embed_pinned_message()
+        await void_plus_message.edit(embed=embed, attachments=[file])
 
     @check_void_deals_embed.before_loop
     @check_void_deals_daily.before_loop

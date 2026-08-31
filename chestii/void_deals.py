@@ -254,7 +254,7 @@ def build_embed_today_deals():
     return embed, file
 
 def build_embed_pinned_message():
-    embed = build_embed_today_deals()
+    embed, file = build_embed_today_deals()
     next_perfect_crate = get_void_deals_next_hit(datetime.now(), 'crate', 150)
     next_perfect_ticket_shard = get_void_deals_next_hit(datetime.now(), 'ticketShard', 150)
     next_perfect_ticket = get_void_deals_next_hit(datetime.now(), 'ticket', 200)
@@ -269,7 +269,7 @@ def build_embed_pinned_message():
 
     embed.add_field(name='', value=formatted, inline=False)
 
-    return embed
+    return embed, file
 
 def build_embed_next_hit_deals(class_name, max_cost_per_unit):
     response = get_void_deals_next_hit(datetime.now(), class_name, max_cost_per_unit)
