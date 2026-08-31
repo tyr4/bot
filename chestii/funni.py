@@ -11,7 +11,7 @@ import json
 
 from chestii.wrapped import update_wrapped_data
 from chestii.sheet import get_event_week_data
-from chestii.void_deals import build_embed_today_deals, should_send_deals_today, build_void_deals_ping
+from chestii.void_deals import build_embed_today_deals, should_send_deals_today, build_void_deals_ping, build_embed_pinned_message
 
 log_ok = 0
 kuru_lock = asyncio.Lock()
@@ -240,11 +240,13 @@ general_channel = None
 help_channel = None
 embed_message_help = None
 void_plus_channel = None
+void_plus_message = None
 
 class Funni(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.check_rateup_embed.start()
+        self.check_void_deals_daily.start()
         self.check_void_deals_embed.start()
 
     @commands.command()
@@ -276,7 +278,7 @@ class Funni(commands.Cog):
         #         await asyncio.sleep(1)
 
     @tasks.loop(seconds=60)
-    async def check_void_deals_embed(self):
+    async def check_void_deals_daily(self):
         global void_plus_channel
 
         if should_send_deals_today():
@@ -285,14 +287,25 @@ class Funni(commands.Cog):
 
             await void_plus_channel.send(pings, embed=embed)
 
+    @tasks.loop(seconds=8)
+    async def check_void_deals_embed(self):
+        global void_plus_channel
+        global void_plus_message
+
+        embed = build_embed_pinned_message()
+        await void_plus_message.edit(embed=embed)
+
     @check_void_deals_embed.before_loop
+    @check_void_deals_daily.before_loop
     async def before_check_void_deals_embed(self):
         global void_plus_channel
+        global void_plus_message
 
         print("se asteapta void deals")
         await self.bot.wait_until_ready()
 
-        void_plus_channel = await self.bot.fetch_channel(1102311924735168517)
+        void_plus_channel = await self.bot.fetch_channel(952006398076657664)
+        void_plus_message = await void_plus_channel.fetch_message(1543577334374735883)
 
     @check_rateup_embed.before_loop
     async def before_check_rateup_embed(self):
@@ -686,8 +699,8 @@ class Funni(commands.Cog):
                 await user.send("🍔")
 
             if "?deals" in message.content.lower():
-                embed = build_embed_today_deals()
-                await message.reply(embed=embed, mention_author=False)
+                embed, file = build_embed_today_deals()
+                await message.reply(embed=embed, file=file, mention_author=False)
 
                 await update_wrapped_data("?deals", username=message.author.name, user_id=message.author.id)
 

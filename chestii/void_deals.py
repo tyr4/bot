@@ -7,6 +7,8 @@ import requests
 import json
 import os
 
+from void_deals_image_gen.image_gen import generate_image
+
 url = "https://jxjshswlabnmkxhyhbdx.supabase.co/functions/v1/sandbox"
 STATE_FILE = "void_deals_state.json"
 
@@ -64,8 +66,8 @@ def get_last_reset_time() -> datetime:
 
     return reset_today
 
-def get_reset_date():
-    date = datetime.now(timezone.utc)
+def get_reset_date(start_date: datetime):
+    date = start_date.astimezone(timezone.utc)
 
     return date.replace(hour=12, minute=0, second=0, microsecond=0)
 
@@ -91,8 +93,12 @@ def get_deal_date(start_date: datetime = None):
     print(start_date, date)
     return format_date(date)
 
-def get_void_deals():
-    formatted = format_date(get_last_reset_time())
+def get_void_deals(specific_date: datetime = None):
+    if specific_date:
+        formatted = get_deal_date(specific_date)
+    else:
+        formatted = format_date(get_last_reset_time())
+
     print(formatted)
 
     response = call_api(
@@ -104,7 +110,7 @@ def get_void_deals():
 
     return response
 
-def get_void_deals_next(start_date: datetime, class_name: str, max_cost_per_unit: int):
+def get_void_deals_next_hit(start_date: datetime, class_name: str, max_cost_per_unit: int):
     formatted = get_deal_date(start_date)
 
     response = call_api(
@@ -141,7 +147,7 @@ def get_void_deals_projection(start_date: datetime, days: int):
 
 def get_void_deals_basic_embed():
     embed = discord.Embed(title="Void Deals <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
-    embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
+    embed.set_footer(text="Deals brought to you by Hommee",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
 
     return embed
@@ -152,7 +158,7 @@ def class2emote(class_name: str):
     else:
         return "<:Resource_voidTicket:969512352674353182>"
 
-def cost2emote(class_name: str):
+def cost_class_2emote(class_name: str):
     if class_name == "crate":
         return "<:Resource_crate:1167984753513873428>"
     elif class_name == "ticketShard":
@@ -177,66 +183,40 @@ def class_and_cost2ping(class_name: str, cost: int):
 
     return ''
 
-def class_and_cost2rarity(slot: dict):
-    class_name = slot['className']
-    cost = slot['costPerUnit']
+def rarity2emote(rarity):
+    if rarity == "perfect":
+        return "🟡🟡🟡"
+    elif rarity == "legendary":
+        return "🟡"
+    elif rarity == "epic":
+        return "🟣"
+    elif rarity == "rare":
+        return "🔵"
+    else:
+        return "⚪"
 
-    print(class_name, cost)
-
-    if class_name == "crate":
-        cost = slot['cost'] # small api bug
-
-        if 150 <= cost <= 160:
-            return "🟡"
-        elif cost == 170:
-            return "🟣"
-        elif cost == 180:
-            return "🔵"
-        elif cost == 190:
-            return "⚪"
-
-    elif class_name == "ticket":
-        if 200 <= cost < 226:
-            return "🟡"
-        elif 226 <= cost <= 250:
-            return "🟣"
-        elif 251 <= cost <= 276:
-            return "🔵"
-        elif 276 < cost:
-            return "⚪"
-
-    elif class_name == "ticketShard":
-        if 150 <= cost < 163:
-            return "🟡"
-        elif 163 <= cost <= 176:
-            return "🟣"
-        elif 176 <= cost <= 188:
-            return "🔵"
-        elif 188 < cost:
-            return "⚪"
-
-    return ''
-
-def get_next_deals_timestamp():
-    today = datetime.now(timezone.utc)
-    reset_today = get_reset_date()
+def get_next_deals_timestamp(date: datetime):
+    today = date.astimezone(timezone.utc)
+    reset_today = get_reset_date(today)
 
     if today < reset_today:
         return reset_today.timestamp()
     else:
         return (reset_today + timedelta(days=1)).timestamp()
 
+def string2timestamp(formatted_date: str):
+    return datetime.strptime(formatted_date, "%Y-%m-%d").replace(tzinfo=timezone.utc, hour=12).timestamp()
 
 def build_embed_slot_field(embed, slot_count, slot: dict):
     slot_class = slot["className"]
 
     formatted = f"**x{slot['amount']} {class2name(slot_class)} {class2emote(slot_class)}**\n"
-    formatted += f"**Cost:** {slot['cost']} {cost2emote(slot_class)}\n"
+    formatted += f"**Cost:** {slot['cost']} {cost_class_2emote(slot_class)}\n"
 
     if slot_class != "crate":
-        formatted += f"**Rate:** {slot['costPerUnit']} {cost2emote(slot_class)}\n"
+        formatted += f"**Rate:** {slot['costPerUnit']} {cost_class_2emote(slot_class)}\n"
 
-    embed.add_field(name=f"Slot {slot_count} {class_and_cost2rarity(slot)}", value=formatted, inline=False)
+    embed.add_field(name=f"Slot {slot_count} {rarity2emote(slot['rarity'])}", value=formatted, inline=False)
 
 def build_void_deals_ping():
     response = get_void_deals()
@@ -249,23 +229,75 @@ def build_void_deals_ping():
     return message
 
 def build_all_embed_slots(embed, slots: list, date: datetime):
-    tomorrow_timestamp = get_next_deals_timestamp()
+    tomorrow_timestamp = get_next_deals_timestamp(date)
     embed.add_field(name=f"Date: {format_date(date)}", value='', inline=False)
 
-    build_embed_slot_field(embed, 1, slots[0])
-    build_embed_slot_field(embed, 2, slots[1])
-    build_embed_slot_field(embed, 3, slots[2])
+    # build_embed_slot_field(embed, 1, slots[0])
+    # build_embed_slot_field(embed, 2, slots[1])
+    # build_embed_slot_field(embed, 3, slots[2])
 
+    image_path = generate_image(date)
+    file = discord.File(image_path, filename="deals.png")
+
+    embed.set_image(url="attachment://deals.png")
     embed.add_field(name=f"Next deals are <t:{tomorrow_timestamp:.0f}:R>", value='', inline=False)
+
+    return file
 
 def build_embed_today_deals():
     response = get_void_deals()
     embed = get_void_deals_basic_embed()
     slots = response['result']['slots']
 
-    build_all_embed_slots(embed, slots, get_last_reset_time())
+    file = build_all_embed_slots(embed, slots, get_last_reset_time())
+
+    return embed, file
+
+def build_embed_pinned_message():
+    embed = build_embed_today_deals()
+    next_perfect_crate = get_void_deals_next_hit(datetime.now(), 'crate', 150)
+    next_perfect_ticket_shard = get_void_deals_next_hit(datetime.now(), 'ticketShard', 150)
+    next_perfect_ticket = get_void_deals_next_hit(datetime.now(), 'ticket', 200)
+
+    crate_timestamp = string2timestamp(next_perfect_crate['result']['deal']['date'])
+    ticket_shard_timestamp = string2timestamp(next_perfect_ticket_shard['result']['deal']['date'])
+    ticket_timestamp = string2timestamp(next_perfect_ticket['result']['deal']['date'])
+
+    formatted = f"**Next perfect {class2emote('crate')} is <t:{crate_timestamp:.0f}:R>**\n"
+    formatted += f'**Next perfect {class2emote('ticketShard')} {cost_class_2emote('ticketShard')} is <t:{ticket_shard_timestamp:.0f}:R>**\n'
+    formatted += f'**Next perfect {class2emote('ticket')} {cost_class_2emote('ticket')} is <t:{ticket_timestamp:.0f}:R>**'
+
+    embed.add_field(name='', value=formatted, inline=False)
 
     return embed
+
+def build_embed_next_hit_deals(class_name, max_cost_per_unit):
+    response = get_void_deals_next_hit(datetime.now(), class_name, max_cost_per_unit)
+    embed = get_void_deals_basic_embed()
+    print(response)
+
+    if response['result']['deal'] is None:
+        embed.add_field(name="No deals found for this price!", value='', inline=False)
+        return embed
+
+    date = datetime.strptime(response['result']['deal']['date'], "%Y-%m-%d").replace(tzinfo=timezone.utc, hour=12)
+
+    full_deals = get_void_deals(date)
+    slots = [slot for slot in full_deals['result']['slots']]
+
+    build_all_embed_slots(embed, slots, date)
+
+    return embed
+
+def build_embed_projection_deals(days):
+    response = get_void_deals_projection(datetime.now(), days)
+    embed = get_void_deals_basic_embed()
+
+    embed.add_field(name=f"Day period: {days} days",
+                    value=f'Buying all {class2emote('ticketShard')} {cost_class_2emote('ticketShard')} deals over a '
+                          f'{days} day period will yield: \n'
+                          f'x{response['result']['totalAmount']} {class2emote('ticketShard')}')
+
 
 class VoidDeals(commands.GroupCog, name="void_deals"):
     def __init__(self, bot: commands.Bot) -> None:
@@ -274,14 +306,40 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
 
     @app_commands.command(name="today", description="Sends today's void deals")
     @app_commands.checks.has_permissions(manage_messages=True)
-    async def void_deals_today(self, interaction: discord.Interaction,):
+    async def void_deals_today(self, interaction: discord.Interaction, invisible: bool = True):
         embed = build_embed_today_deals()
 
-        await interaction.response.send_message(embed=embed)
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.send_message(embed=embed)
+        elif invisible is True:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="next_hit", description="Sends the deals for the day that matches your specified criteria")
+    @app_commands.checks.has_permissions(manage_messages=True)
+    @app_commands.choices(deal_type=[
+        discord.app_commands.Choice(name="Void Crate", value='crate'),
+        discord.app_commands.Choice(name="Void Ticket to Ticket", value='ticket'),
+        discord.app_commands.Choice(name="Void Ticket to Shards", value='ticketShard'),
+    ])
+    @app_commands.describe(deal_type="The desired deal type")
+    @app_commands.describe(maximum_price_per_unit="Crate cost range: 150-190, Ticket to Ticket cost range: 200-300, Ticket to Shard cost range: 150-200")
+    async def void_deals_next_hit(self, interaction: discord.Interaction, deal_type: discord.app_commands.Choice[str],
+                                  maximum_price_per_unit: int, invisible: bool = True):
+
+        embed = build_embed_next_hit_deals(deal_type.value, maximum_price_per_unit)
+
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.send_message(embed=embed)
+        elif invisible is True:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(VoidDeals(bot))
 
-rez = get_deal_date(datetime.now())
+rez = get_void_deals(datetime(2026, 9, 21, hour=datetime.now().hour))
 print(rez)
