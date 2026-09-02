@@ -432,14 +432,14 @@ def generate_image(date: datetime):
 
     deals = render_shop_from_api(response, shop_date, template, assets_dir, font, output)
 
-    print(f"Daily Deals for {shop_date:%Y-%m-%d}")
+    # print(f"Daily Deals for {shop_date:%Y-%m-%d}")
     for deal in deals:
         rarity = RARITY_NAMES[deal["rarity"]]
         ratio = deal["cost"] / deal["amount"]
-        print(
-            f"Slot {deal['slot'] + 1}: {rarity} {deal['output_name']} x{deal['amount']} "
-            f"for {deal['cost']} {deal['payment_name']} (ratio {ratio:.2f})"
-        )
+        # print(
+            # f"Slot {deal['slot'] + 1}: {rarity} {deal['output_name']} x{deal['amount']} "
+            # f"for {deal['cost']} {deal['payment_name']} (ratio {ratio:.2f})"
+        # )
 
-    print(f"Saved: {output}")
+    # print(f"Saved: {output}")
     return output

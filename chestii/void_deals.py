@@ -90,7 +90,7 @@ def get_deal_date(start_date: datetime = None):
     else:
         date = start_date
 
-    print(start_date, date)
+    # print(start_date, date)
     return format_date(date)
 
 def get_void_deals(specific_date: datetime = None):
@@ -99,7 +99,7 @@ def get_void_deals(specific_date: datetime = None):
     else:
         formatted = format_date(get_last_reset_time())
 
-    print(formatted)
+    # print(formatted)
 
     response = call_api(
         {
@@ -111,7 +111,7 @@ def get_void_deals(specific_date: datetime = None):
     return response
 
 def get_void_deals_next_hit(start_date: datetime, class_name: str, max_cost_per_unit: int):
-    formatted = get_deal_date(start_date)
+    formatted = get_deal_date(start_date + timedelta(days=1))
 
     response = call_api(
         {
@@ -228,8 +228,10 @@ def build_void_deals_ping():
 
     return message
 
-def build_all_embed_slots(embed, slots: list, date: datetime):
-    tomorrow_timestamp = get_next_deals_timestamp(date)
+def build_all_embed_slots(embed, slots: list, date: datetime, override_with_today_deals_date: bool = False):
+    timestamp = get_next_deals_timestamp(date - timedelta(days=1)) if override_with_today_deals_date \
+                else get_next_deals_timestamp(date)
+
     embed.add_field(name=f"Date: {format_date(date)}", value='', inline=False)
 
     # build_embed_slot_field(embed, 1, slots[0])
@@ -240,7 +242,7 @@ def build_all_embed_slots(embed, slots: list, date: datetime):
     file = discord.File(image_path, filename="deals.png")
 
     embed.set_image(url="attachment://deals.png")
-    embed.add_field(name=f"Next deals are <t:{tomorrow_timestamp:.0f}:R>", value='', inline=False)
+    embed.add_field(name=f"Next deals are <t:{timestamp:.0f}:R>", value='', inline=False)
 
     return file
 
@@ -274,30 +276,40 @@ def build_embed_pinned_message():
 def build_embed_next_hit_deals(class_name, max_cost_per_unit):
     response = get_void_deals_next_hit(datetime.now(), class_name, max_cost_per_unit)
     embed = get_void_deals_basic_embed()
-    print(response)
+    # print(response)
 
     if response['result']['deal'] is None:
         embed.add_field(name="No deals found for this price!", value='', inline=False)
         return embed
 
     date = datetime.strptime(response['result']['deal']['date'], "%Y-%m-%d").replace(tzinfo=timezone.utc, hour=12)
+    print(date)
 
     full_deals = get_void_deals(date)
     slots = [slot for slot in full_deals['result']['slots']]
 
-    build_all_embed_slots(embed, slots, date)
+    file = build_all_embed_slots(embed, slots, date, override_with_today_deals_date=True)
 
-    return embed
+    return embed, file
 
 def build_embed_projection_deals(days):
     response = get_void_deals_projection(datetime.now(), days)
     embed = get_void_deals_basic_embed()
 
-    embed.add_field(name=f"Day period: {days} days",
-                    value=f'Buying all {class2emote('ticketShard')} {cost_class_2emote('ticketShard')} deals over a '
-                          f'{days} day period will yield: \n'
-                          f'x{response['result']['totalAmount']} {class2emote('ticketShard')}')
+    if days <= 0:
+        embed.add_field(name="Error", value='Days must be a positive value!', inline=False)
+        return embed
+    elif days >= 365:
+        embed.add_field(name="Error", value='Days must be below 365!', inline=False)
 
+    embed.add_field(name=f"Day period: {days} days",
+                    value=f'\nBuying all {class2emote('ticketShard')} {cost_class_2emote('ticket')} deals over a '
+                          f'{days} day period will result in the following: \n\n'
+                          f'**+{response['result']['totalAmount']} Void Tickets {class2emote('ticketShard')}**\n'
+                          f'**-{response['result']['totalCost']} Tickets {cost_class_2emote('ticket')}**')
+
+
+    return embed
 
 class VoidDeals(commands.GroupCog, name="void_deals"):
     def __init__(self, bot: commands.Bot) -> None:
@@ -305,19 +317,18 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
         super().__init__()
 
     @app_commands.command(name="today", description="Sends today's void deals")
-    @app_commands.checks.has_permissions(manage_messages=True)
     async def void_deals_today(self, interaction: discord.Interaction, invisible: bool = True):
-        embed = build_embed_today_deals()
-
-        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-            await interaction.response.send_message(embed=embed)
-        elif invisible is True:
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+            await interaction.response.defer(ephemeral=True)
         else:
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.defer()
+
+        embed, file = build_embed_today_deals()
+
+
+        await interaction.followup.send(embed=embed, file=file)
 
     @app_commands.command(name="next_hit", description="Sends the deals for the day that matches your specified criteria")
-    @app_commands.checks.has_permissions(manage_messages=True)
     @app_commands.choices(deal_type=[
         discord.app_commands.Choice(name="Void Crate", value='crate'),
         discord.app_commands.Choice(name="Void Ticket to Ticket", value='ticket'),
@@ -327,19 +338,54 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
     @app_commands.describe(maximum_price_per_unit="Crate cost range: 150-190, Ticket to Ticket cost range: 200-300, Ticket to Shard cost range: 150-200")
     async def void_deals_next_hit(self, interaction: discord.Interaction, deal_type: discord.app_commands.Choice[str],
                                   maximum_price_per_unit: int, invisible: bool = True):
-
-        embed = build_embed_next_hit_deals(deal_type.value, maximum_price_per_unit)
-
-        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
-            await interaction.response.send_message(embed=embed)
-        elif invisible is True:
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+            await interaction.response.defer(ephemeral=True)
         else:
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.defer()
 
+        embed, file = build_embed_next_hit_deals(deal_type.value, maximum_price_per_unit)
+
+        await interaction.followup.send(embed=embed, file=file)
+
+    @app_commands.command(name="projection", description="Sends the amount of Void Tickets you can get in a timeframe. Shards not supported")
+    @app_commands.describe(day_period="The amount of days to sum up deals for. Value range is 1-365 days.")
+    async def void_deals_projection(self, interaction: discord.Interaction, day_period: int, invisible: bool = True):
+        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+            await interaction.response.defer(ephemeral=True)
+        else:
+            await interaction.response.defer()
+
+        embed = build_embed_projection_deals(day_period)
+
+        await interaction.followup.send(embed=embed)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(VoidDeals(bot))
 
-rez = get_void_deals(datetime(2026, 9, 21, hour=datetime.now().hour))
-print(rez)
+# days = 30
+# buy_ticket_to_ticket = True
+#
+# spent_shard_sum = 0
+# spent_ticket_sum = 0
+# gained_ticket_sum = 0
+#
+# shard_ratio_threshold = 160
+# start_date = datetime.now() + timedelta(days=1)
+#
+# for i in range(1, days + 1):
+#     response = get_void_deals(start_date)
+#     slots = response['result']['slots']
+#
+#     for slot in slots:
+#         if slot['className'] == 'ticketShard':
+#             if slot['costPerUnit'] <= shard_ratio_threshold:
+#                 spent_shard_sum += slot['cost']
+#                 gained_ticket_sum += slot['amount']
+#
+#         elif slot['className'] == 'ticket' and buy_ticket_to_ticket:
+#             spent_ticket_sum += slot['cost']
+#             gained_ticket_sum += slot['amount']
+#
+#     start_date += timedelta(days=1)
+#
+# print(gained_ticket_sum, spent_shard_sum, spent_ticket_sum)
