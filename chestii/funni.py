@@ -10,7 +10,6 @@ import datetime
 import json
 
 from chestii.wrapped import update_wrapped_data
-from chestii.sheet import get_event_week_data
 from chestii.void_deals import build_embed_today_deals, should_send_deals_today, build_void_deals_ping, \
     build_embed_pinned_message
 
@@ -476,7 +475,7 @@ class Funni(commands.Cog):
                          f'"`{message.content[:1900]}`"')
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
         if message.author.id == 1135983715646976111:
             return
 
@@ -627,39 +626,6 @@ class Funni(commands.Cog):
                     "<:Hero_Clarissa:703021406270783573> <#1169777605143166976> <:Hero_Clarissa:703021406270783573>",
                     mention_author=False)
 
-            if "?gala" in message.content.lower():
-                await message.reply(
-                    f"An updated gala for players at 0-36k like <@977660878080057344> and me: [THE NEW GALA](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
-                    "If you only want to use the command for yourself, you can use it in <#699337693238263900> or find the link in <#637933543699513367>",
-                    mention_author=False)
-                await update_wrapped_data("?gala", username=message.author.name, user_id=message.author.id)
-
-            if "?evl" in message.content.lower():
-                await message.reply(
-                    f"An updated evl for players at 0-36k like <@553194887701331969> and me: [THE NEW EVL](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
-                    "If you only want to use the command for yourself, you can use it in <#699337693238263900> or find the link in <#637933543699513367>")
-                await update_wrapped_data("?evl", username=message.author.name, user_id=message.author.id)
-
-            if "?cyber" in message.content.lower():
-                await message.reply(f"DBG Site with most sheets/formulas: https://dbg-calculator.vercel.app",
-                                    mention_author=False)
-                await update_wrapped_data("?cyber", username=message.author.name, user_id=message.author.id)
-
-            if "?tyr" in message.content.lower():
-                await message.reply(
-                    "Updated Optimal Rewind Calculator with stats calculations: <https://docs.google.com/spreadsheets/d/1ChZHbUy914-4r9vvcjviKCUfBqnJKiUvpnsG321XoWM/edit?gid=0#gid=0>",
-                    mention_author=False)
-                await update_wrapped_data("?tyr", username=message.author.name, user_id=message.author.id)
-
-            if "?death" in message.content.lower():
-                await message.channel.send("<@674287880981708821> Hi hi hello")
-
-                await asyncio.sleep(6)
-
-                await message.channel.send("<@674287880981708821> Once more for good measure")
-
-                await update_wrapped_data("?death", username=message.author.name, user_id=message.author.id)
-
             if "?rateup" in message.content.lower():
                 print("am intrat")
                 embed = rateup_embed()
@@ -672,39 +638,6 @@ class Funni(commands.Cog):
                     mention_author=False, embed=embed)
 
                 await update_wrapped_data("?rateup", username=message.author.name, user_id=message.author.id)
-
-            if "?darksheet" in message.content.lower():
-                await message.reply(
-                    "You can find all Dark Tome buff values and costs here: <https://docs.google.com/spreadsheets/d/1Q1c3qUT74m3kT6ePJOm-Nib05v7I1Ua5AB9XdKn6HME/edit?gid=0#gid=0>",
-                    mention_author=False)
-                await update_wrapped_data("?darksheet", username=message.author.name, user_id=message.author.id)
-
-            if "?events" in message.content.lower():
-                embed = get_event_week_data()
-
-                await message.reply(mention_author=False, embed=embed)
-                await update_wrapped_data("?events", username=message.author.name, user_id=message.author.id)
-
-            if "?wtcalc" in message.content.lower():
-                text = "<:WT_Apple:1019750592001867867> **[World Tree Calculator](<https://docs.google.com/spreadsheets/d/1A-J5gifZtwgBL1_WzR9eXIM4InxccwyIc5f998ZPKXM/edit?gid=548764124#gid=548764124>)** <:WT_Apple:1019750592001867867>  /  *[[Alternative Calc in Browser]](https://dbg-calculator.vercel.app/pages/worldtree.html)*\n" \
-                       "Use this to figure out where to invest your apples for the most optimal days of damage & Monarch's WT Planner to plan out your next World Tree Build! \n" \
-                       "(short guide on how to use it here: https://discord.com/channels/570929677732937738/1191279847427817482/1458890737193193688) \n" \
-                       "-# Don't forget you have to make a copy! If you're on phone, you have to download the Google Sheets app"
-
-                await message.reply(text, mention_author=False)
-                await update_wrapped_data("?wtcalc", username=message.author.name, user_id=message.author.id)
-
-            if "?halloween" in message.content.lower():
-                await message.reply(
-                    "Halloween Event Boss Team: <:Hero_DarkMerlin:703020537089097789> <:Hero_Mikhail:703033570402238495> <:Hero_Max:703017718835838997> <:Hero_Dewitt:703020422005915658> <:Hero_Saul:977594194988236861> <:Hero_Garp:729434017296023675> (decent for all difficulties)\n" \
-                    "For Insane, 15* <:Hero_DarkMerlin:703020537089097789> is required", mention_author=False)
-                await update_wrapped_data("?halloween", username=message.author.name, user_id=message.author.id)
-
-            if "?mammoths" in message.content.lower():
-                if message.author.id != 954082451762847746:
-                    await message.reply("https://tenor.com/view/woolly-mammoth-aio-ai-vi!deo-gif-2546557529878141509",
-                                        mention_author=False)
-                    await update_wrapped_data("?mammoths", username=message.author.name, user_id=message.author.id)
 
             if ("🐊" in message.content.lower() and "🎷" in message.content.lower()) or (
                     "crocodile" in message.content.lower() and "saxophone" in message.content.lower()):
