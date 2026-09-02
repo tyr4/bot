@@ -1,4 +1,7 @@
 import asyncio
+import json
+import os
+import pathlib
 import re
 
 import discord
@@ -15,7 +18,15 @@ PAGE_LIST_URL = "https://daysbygone.wiki.gg/api.php?action=query&list=allpages&a
 PAGE_ANCHORS_URL = "https://daysbygone.wiki.gg/api.php?action=parse&prop=sections&format=json&page=REPLACEME"
 headers = {"User-Agent": "Silwuf/1.0 (User:Tyrael; cevamail@gmail.com)"}
 REPLACE_TOKEN = "REPLACEME"
+ABBREVIATIONS_PATH = "abbreviations.json"
 MATCH_THRESHOLD = 70
+
+def get_wiki_deals_basic_embed():
+    embed = discord.Embed(title="Wiki Commands <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
+    embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
+                     icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
+
+    return embed
 
 def get_page_list_json():
     response = requests.get(PAGE_LIST_URL, headers=headers)
@@ -93,6 +104,14 @@ def command_to_page_anchor_matcher(command: list[str], parent_page: str | None =
 
     return [pages[0], [(lookup[match], score, idx) for match, score, idx in results]]
 
+def expand_command(content: str) -> str:
+    abbreviations = load_abbreviations()
+    words = content.split()
+
+    expanded = [abbreviations.get(word, word) for word in words]
+
+    return " ".join(expanded)
+
 async def parse_message(message: discord.Message):
     exclusion_list = [
         "evl",
@@ -108,6 +127,7 @@ async def parse_message(message: discord.Message):
     ]
 
     pattern = r"[?#]\S+(?:\s+\S+)?"
+    # content = expand_command(message.content)
     for match in re.finditer(pattern, message.content): # change to message.content
         raw = match.group(0)
         raw_list = raw.split()
@@ -121,7 +141,7 @@ async def parse_message(message: discord.Message):
         if skip_command:
             continue
 
-        no_prefix_list = raw.lstrip("?#").split()
+        no_prefix_list = expand_command(raw.lstrip("?#")).split()
 
         print(raw)
 
@@ -161,7 +181,71 @@ async def send_message(message, url, result):
 
     await message.reply(formatted, mention_author=False)
 
-class WikiCommands(commands.Cog):
+def load_abbreviations() -> dict:
+    if not os.path.exists(ABBREVIATIONS_PATH):
+        return {}
+
+    with open(ABBREVIATIONS_PATH, "r") as f:
+        return json.load(f)
+
+def save_abbreviation(data) -> None:
+    path = pathlib.Path(ABBREVIATIONS_PATH)
+    tmp = path.with_suffix(".tmp")
+
+    with tmp.open("w") as f:
+        json.dump(data, f, indent=4)
+
+    tmp.replace(ABBREVIATIONS_PATH)
+
+def add_abbreviation(abbreviated: str, original: str):
+    embed = get_wiki_deals_basic_embed()
+
+    print(original.split(), abbreviated.split())
+    if len(original.split()) > 1 or len(abbreviated.split()) > 1:
+        embed.add_field(name="Error!", value="Input can only be one word long", inline=False)
+        return embed
+
+    data = load_abbreviations()
+    data[abbreviated] = original
+
+    save_abbreviation(data)
+    embed.add_field(name="Success!", value=f"Added **\"{abbreviated}\"** as **\"{original}\"**!", inline=False)
+
+    return embed
+
+def remove_abbreviation(abbreviated: str):
+    embed = get_wiki_deals_basic_embed()
+
+    if len(abbreviated.split()) > 1:
+        embed.add_field(name="Error!", value="Input can only be one word long", inline=False)
+        return embed
+
+    data = load_abbreviations()
+    popped = data.pop(abbreviated, None)
+
+    if popped:
+        save_abbreviation(data)
+        embed.add_field(name="Success!", value=f"Removed **\"{abbreviated}\"** as **\"{popped}\"**!", inline=False)
+    else:
+        embed.add_field(name="Error!", value="No such abbreviation!", inline=False)
+
+    return embed
+
+def list_abbreviations():
+    embed = get_wiki_deals_basic_embed()
+    data = load_abbreviations()
+
+    formatted = "```\n"
+
+    for key, value in data.items():
+        formatted += f"{key}: \t{value}\n"
+
+    formatted += "```"
+
+    embed.add_field(name="All abbreviations", value=formatted, inline=False)
+    return embed
+
+class WikiCommands(commands.GroupCog, name="wiki_commands"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -182,24 +266,24 @@ class WikiCommands(commands.Cog):
                 mention_author=False)
             await update_wrapped_data("?gala", username=message.author.name, user_id=message.author.id)
 
-        if "?evl" in message_lower:
+        elif "?evl" in message_lower:
             await message.reply(
                 f"An updated evl for players at 0-36k like <@553194887701331969> and me: [THE NEW EVL](<https://docs.google.com/document/d/1ZBD3OQuU0kuBt3L-s7zq__QWxjnge1meVs5B_nke9nM/edit?tab=t.0>)\n\n"
                 "If you only want to use the command for yourself, you can use it in <#699337693238263900> or find the link in <#637933543699513367>")
             await update_wrapped_data("?evl", username=message.author.name, user_id=message.author.id)
 
-        if "?cyber" in message_lower:
+        elif "?cyber" in message_lower:
             await message.reply(f"DBG Site with most sheets/formulas: https://dbg-calculator.vercel.app",
                                 mention_author=False)
             await update_wrapped_data("?cyber", username=message.author.name, user_id=message.author.id)
 
-        if "?tyr" in message_lower:
+        elif "?tyr" in message_lower:
             await message.reply(
                 "Updated Optimal Rewind Calculator with stats calculations: <https://docs.google.com/spreadsheets/d/1ChZHbUy914-4r9vvcjviKCUfBqnJKiUvpnsG321XoWM/edit?gid=0#gid=0>",
                 mention_author=False)
             await update_wrapped_data("?tyr", username=message.author.name, user_id=message.author.id)
 
-        if "?death" in message_lower:
+        elif "?death" in message_lower:
             await message.channel.send("<@674287880981708821> Hi hi hello")
 
             await asyncio.sleep(6)
@@ -208,19 +292,19 @@ class WikiCommands(commands.Cog):
 
             await update_wrapped_data("?death", username=message.author.name, user_id=message.author.id)
 
-        if "?darksheet" in message_lower:
+        elif "?darksheet" in message_lower:
             await message.reply(
                 "You can find all Dark Tome buff values and costs here: <https://docs.google.com/spreadsheets/d/1Q1c3qUT74m3kT6ePJOm-Nib05v7I1Ua5AB9XdKn6HME/edit?gid=0#gid=0>",
                 mention_author=False)
             await update_wrapped_data("?darksheet", username=message.author.name, user_id=message.author.id)
 
-        if "?events" in message_lower:
+        elif "?events" in message_lower:
             embed = get_event_week_data()
 
             await message.reply(mention_author=False, embed=embed)
             await update_wrapped_data("?events", username=message.author.name, user_id=message.author.id)
 
-        if "?wtcalc" in message_lower:
+        elif "?wtcalc" in message_lower:
             text = "<:WT_Apple:1019750592001867867> **[World Tree Calculator](<https://docs.google.com/spreadsheets/d/1A-J5gifZtwgBL1_WzR9eXIM4InxccwyIc5f998ZPKXM/edit?gid=548764124#gid=548764124>)** <:WT_Apple:1019750592001867867>  /  *[[Alternative Calc in Browser]](https://dbg-calculator.vercel.app/pages/worldtree.html)*\n" \
                    "Use this to figure out where to invest your apples for the most optimal days of damage & Monarch's WT Planner to plan out your next World Tree Build! \n" \
                    "(short guide on how to use it here: https://discord.com/channels/570929677732937738/1191279847427817482/1458890737193193688) \n" \
@@ -229,20 +313,66 @@ class WikiCommands(commands.Cog):
             await message.reply(text, mention_author=False)
             await update_wrapped_data("?wtcalc", username=message.author.name, user_id=message.author.id)
 
-        if "?halloween" in message_lower:
+        elif "?halloween" in message_lower:
             await message.reply(
                 "Halloween Event Boss Team: <:Hero_DarkMerlin:703020537089097789> <:Hero_Mikhail:703033570402238495> <:Hero_Max:703017718835838997> <:Hero_Dewitt:703020422005915658> <:Hero_Saul:977594194988236861> <:Hero_Garp:729434017296023675> (decent for all difficulties)\n" \
                 "For Insane, 15* <:Hero_DarkMerlin:703020537089097789> is required", mention_author=False)
             await update_wrapped_data("?halloween", username=message.author.name, user_id=message.author.id)
 
-        if "?mammoths" in message_lower:
+        elif "?mammoths" in message_lower:
             if message.author.id != 954082451762847746:
                 await message.reply("https://tenor.com/view/woolly-mammoth-aio-ai-vi!deo-gif-2546557529878141509",
                                     mention_author=False)
                 await update_wrapped_data("?mammoths", username=message.author.name, user_id=message.author.id)
 
-        response = await parse_message(message)
-        print(response)
+        else:
+            response = await parse_message(message)
+            print(response)
+
+    @app_commands.command(name="add_abbreviation", description="Add an abbreviation for a longer page name")
+    @app_commands.checks.has_any_role("test", "Wiki-helper", "FAQ-Helper", "Moderator", "Admin")
+    async def add_wiki_abbreviation(self, interaction: discord.Interaction, abbreviated: str, original_name: str, invisible: bool = True):
+        embed = add_abbreviation(abbreviated, original_name)
+
+        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="remove_abbreviation", description="Remove an abbreviation for a longer page name")
+    @app_commands.checks.has_any_role("test", "Wiki-helper", "FAQ-Helper", "Moderator", "Admin")
+    async def remove_wiki_abbreviation(self, interaction: discord.Interaction, abbreviated: str, invisible: bool = True):
+        embed = remove_abbreviation(abbreviated)
+
+        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="list_abbreviations", description="List all abbreviations corresponding to page names")
+    async def list_wiki_abbreviations(self, interaction: discord.Interaction, invisible: bool = True):
+        embed = list_abbreviations()
+
+        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+        else:
+            await interaction.response.send_message(embed=embed)
+
+
+    @add_wiki_abbreviation.error
+    async def add_wiki_abbreviation_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingAnyRole):
+            await interaction.response.send_message("You don't have permission to use this command.", ephemeral=True)
+        else:
+            raise error
+
+    @remove_wiki_abbreviation.error
+    async def remove_wiki_abbreviation_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingAnyRole):
+            await interaction.response.send_message("You don't have permission to use this command.", ephemeral=True)
+        else:
+            raise error
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(WikiCommands(bot))
