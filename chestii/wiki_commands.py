@@ -21,6 +21,8 @@ REPLACE_TOKEN = "REPLACEME"
 ABBREVIATIONS_PATH = "abbreviations.json"
 MATCH_THRESHOLD = 70
 
+bot_ref: commands.Bot | None = None
+
 def get_wiki_deals_basic_embed():
     embed = discord.Embed(title="Wiki Commands <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
@@ -70,18 +72,22 @@ def get_page_anchors(parent_page):
     return results
 
 def command_to_page_matcher(command: str):
+    if len(command) < 3:
+        return []
+
     all_pages = get_page_list()
     lookup = {p.lower(): p for p in all_pages}
     choices = list(lookup.keys())
 
     results = process.extract(command.lower(), choices, scorer=fuzz.WRatio, limit=5)
+    # print(results)
     if results[0][1] < MATCH_THRESHOLD:
         return []
 
     return [(lookup[match], score, idx) for match, score, idx in results]
 
 def command_to_page_anchor_matcher(command: list[str], parent_page: str | None = None):
-    if len(command) != 2:
+    if len(command) != 2 or len(command[0]) < 3:
         return []
 
     pages = command_to_page_matcher(command[0])
@@ -103,6 +109,24 @@ def command_to_page_anchor_matcher(command: list[str], parent_page: str | None =
         return pages
 
     return [pages[0], [(lookup[match], score, idx) for match, score, idx in results]]
+
+def page_to_emote_matcher(guild_id, page_name) -> discord.Emoji | None:
+    guild = bot_ref.get_guild(guild_id)
+    emojis = guild.emojis
+    emoji_names = [emoji.name for emoji in emojis]
+    clean_names = []
+
+    for emoji in emoji_names:
+        if emoji.find("Hero_") != -1:
+            clean_names.append(emoji.replace("Hero_", ""))
+    # clean_names = [emoji.replace("Hero_", "") for emoji in emoji_names]
+
+    print(emojis)
+
+    result = process.extract(page_name, clean_names, scorer=fuzz.WRatio, limit=5)
+    emoji: str = result[0][0]
+
+    return emojis[emoji_names.index(f"Hero_{emoji}")]
 
 def expand_command(content: str) -> str:
     abbreviations = load_abbreviations()
@@ -174,10 +198,18 @@ async def send_message(message, url, result):
     if not result:
         return
 
+    formatted = ''
+    parent_page_name = result[0][0]
+    anchor_name = result[1][0][0]
+    emoji = page_to_emote_matcher(message.guild.id, parent_page_name)
+
+    if emoji:
+        formatted += f"<:{emoji.name}:{emoji.id}> "
+
     if len(result) == 2:
-        formatted = f"[{result[0][0]} -> {result[1][0][0].replace("_", " ")}](<{url}>)"
+        formatted += f"**[{parent_page_name} -> {anchor_name.replace("_", " ")}](<{url}>)**"
     else:
-        formatted = f"[{result[0][0]}](<{url}>)"
+        formatted += f"**[{parent_page_name}](<{url}>)**"
 
     await message.reply(formatted, mention_author=False)
 
@@ -245,7 +277,7 @@ def list_abbreviations():
     embed.add_field(name="All abbreviations", value=formatted, inline=False)
     return embed
 
-class WikiCommands(commands.GroupCog, name="wiki_commands"):
+class WikiCommands(commands.GroupCog, name="wiki_helper"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         super().__init__()
@@ -330,7 +362,7 @@ class WikiCommands(commands.GroupCog, name="wiki_commands"):
             print(response)
 
     @app_commands.command(name="add_abbreviation", description="Add an abbreviation for a longer page name")
-    @app_commands.checks.has_any_role("test", "Wiki-helper", "FAQ-Helper", "Moderator", "Admin")
+    @app_commands.checks.has_any_role("test", "Wiki-helper", "FAQ-helper", "Moderator", "Admin")
     async def add_wiki_abbreviation(self, interaction: discord.Interaction, abbreviated: str, original_name: str, invisible: bool = True):
         embed = add_abbreviation(abbreviated, original_name)
 
@@ -340,7 +372,7 @@ class WikiCommands(commands.GroupCog, name="wiki_commands"):
             await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="remove_abbreviation", description="Remove an abbreviation for a longer page name")
-    @app_commands.checks.has_any_role("test", "Wiki-helper", "FAQ-Helper", "Moderator", "Admin")
+    @app_commands.checks.has_any_role("test", "Wiki-helper", "FAQ-helper", "Moderator", "Admin")
     async def remove_wiki_abbreviation(self, interaction: discord.Interaction, abbreviated: str, invisible: bool = True):
         embed = remove_abbreviation(abbreviated)
 
@@ -375,6 +407,9 @@ class WikiCommands(commands.GroupCog, name="wiki_commands"):
 
 
 async def setup(bot: commands.Bot) -> None:
+    global bot_ref
+    bot_ref = bot
+
     await bot.add_cog(WikiCommands(bot))
 
 # print(parse_message("wow cool ?text and wowowoww cool ?stuff text ?skills but maybe ?daryon pros"))

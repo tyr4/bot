@@ -108,6 +108,7 @@ def deal_from_api_slot(slot: dict, slot_index: int) -> dict:
         "payment_icon": meta["payment_icon"],
         "amount": slot["amount"],
         "cost": slot["cost"],
+        "ratio": int(slot["cost"]) / int(slot["amount"]),
         "rarity": rarity_letter,
     }
 
@@ -375,7 +376,7 @@ def render_deals_to_image(
 
         draw_gradient_text(
             image,
-            str(deal["cost"]),
+            f"{deal["cost"]} / {deal["ratio"]:.2f}" if deal['kind'] != 'crate' else f"{deal["cost"]}",
             (COST_TEXT_CENTERS[slot], COST_TEXT_Y),
             price_font,
             number_top,

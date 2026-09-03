@@ -250,9 +250,9 @@ void_plus_message = None
 class Funni(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.check_rateup_embed.start()
-        self.check_void_deals_daily.start()
-        self.check_void_deals_embed.start()
+        # self.check_rateup_embed.start()
+        # self.check_void_deals_daily.start()
+        # self.check_void_deals_embed.start()
 
     @commands.command()
     # @commands.has_permissions(manage_messages=True)

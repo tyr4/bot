@@ -128,7 +128,7 @@ def get_void_deals_next_hit(start_date: datetime, class_name: str, max_cost_per_
 
     return response
 
-def get_void_deals_projection(start_date: datetime, days: int):
+def get_void_deals_next_x_raw(start_date: datetime, days):
     formatted = get_deal_date(start_date)
 
     response = call_api(
@@ -137,13 +137,70 @@ def get_void_deals_projection(start_date: datetime, days: int):
             "options": {
                 "voidDealsProjection": {
                     "startDate": formatted,
-                    "days": days
+                    "days": days,
+                    "params": [
+                        {
+                            "id": "weaponcrate",
+                            "className": "crate",
+                            "rarity": ["common", "rare", "epic", "legendary", "perfect"],
+                            "costPerUnitRange": {
+                                "min": 150,
+                                "max": 200
+                            }
+                        },
+                        {
+                            "id": "shardshigh",
+                            "className": "ticketShard",
+                            "amountBand": "high",
+                            "rarity": ["common", "rare", "epic", "legendary", "perfect"],
+                            "costPerUnitRange": {
+                                "min": 150,
+                                "max": 200
+                            }
+                        },
+                        {
+                            "id": "ticket",
+                            "className": "ticket",
+                            "rarity": ["common", "rare", "epic", "legendary", "perfect"],
+                            "costPerUnitRange": {
+                                "min": 200,
+                                "max": 300
+                            }
+                        },
+                        {
+                            "id": "shardslow",
+                            "className": "ticketShard",
+                            "amountBand": "low",
+                            "rarity": ["common", "rare", "epic", "legendary", "perfect"],
+                            "costPerUnitRange": {
+                                "min": 150,
+                                "max": 200
+                            }
+                        }
+                    ]
                 }
             }
         }
     )
 
     return response
+
+# def get_void_deals_projection(start_date: datetime, days: int):
+#     formatted = get_deal_date(start_date)
+#
+#     response = call_api(
+#         {
+#             "domain": "void-deals-projection",
+#             "options": {
+#                 "voidDealsProjection": {
+#                     "startDate": formatted,
+#                     "days": days
+#                 }
+#             }
+#         }
+#     )
+#
+#     return response
 
 def get_void_deals_basic_embed():
     embed = discord.Embed(title="Void Deals <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
@@ -158,7 +215,7 @@ def class2emote(class_name: str):
     else:
         return "<:Resource_voidTicket:969512352674353182>"
 
-def cost_class_2emote(class_name: str):
+def cost_type2emote(class_name: str):
     if class_name == "crate":
         return "<:Resource_crate:1167984753513873428>"
     elif class_name == "ticketShard":
@@ -211,10 +268,10 @@ def build_embed_slot_field(embed, slot_count, slot: dict):
     slot_class = slot["className"]
 
     formatted = f"**x{slot['amount']} {class2name(slot_class)} {class2emote(slot_class)}**\n"
-    formatted += f"**Cost:** {slot['cost']} {cost_class_2emote(slot_class)}\n"
+    formatted += f"**Cost:** {slot['cost']} {cost_type2emote(slot_class)}\n"
 
     if slot_class != "crate":
-        formatted += f"**Rate:** {slot['costPerUnit']} {cost_class_2emote(slot_class)}\n"
+        formatted += f"**Rate:** {slot['costPerUnit']} {cost_type2emote(slot_class)}\n"
 
     embed.add_field(name=f"Slot {slot_count} {rarity2emote(slot['rarity'])}", value=formatted, inline=False)
 
@@ -266,8 +323,8 @@ def build_embed_pinned_message():
     ticket_timestamp = string2timestamp(next_perfect_ticket['result']['deal']['date'])
 
     formatted = f"**Next perfect {class2emote('crate')} is <t:{crate_timestamp:.0f}:R>**\n"
-    formatted += f'**Next perfect {class2emote('ticketShard')} {cost_class_2emote('ticketShard')} is <t:{ticket_shard_timestamp:.0f}:R>**\n'
-    formatted += f'**Next perfect {class2emote('ticket')} {cost_class_2emote('ticket')} is <t:{ticket_timestamp:.0f}:R>**'
+    formatted += f'**Next perfect {class2emote('ticketShard')} {cost_type2emote('ticketShard')} is <t:{ticket_shard_timestamp:.0f}:R>**\n'
+    formatted += f'**Next perfect {class2emote('ticket')} {cost_type2emote('ticket')} is <t:{ticket_timestamp:.0f}:R>**'
 
     embed.add_field(name='', value=formatted, inline=False)
 
@@ -292,22 +349,53 @@ def build_embed_next_hit_deals(class_name, max_cost_per_unit):
 
     return embed, file
 
-def build_embed_projection_deals(days):
-    response = get_void_deals_projection(datetime.now(), days)
+def build_embed_projection_deals(days, shard_ratio_threshold, buy_ticket_to_ticket):
+    response = get_void_deals_next_x_raw(datetime.now(), days)
     embed = get_void_deals_basic_embed()
+
+    spent_shard_sum = 0
+    spent_ticket_sum = 0
+    gained_ticket_shard_sum = 0
+    gained_ticket_to_ticket_sum = 0
 
     if days <= 0:
         embed.add_field(name="Error", value='Days must be a positive value!', inline=False)
         return embed
     elif days >= 365:
         embed.add_field(name="Error", value='Days must be below 365!', inline=False)
+        return embed
 
-    embed.add_field(name=f"Day period: {days} days",
-                    value=f'\nBuying all {class2emote('ticketShard')} {cost_class_2emote('ticket')} deals over a '
-                          f'{days} day period will result in the following: \n\n'
-                          f'**+{response['result']['totalAmount']} Void Tickets {class2emote('ticketShard')}**\n'
-                          f'**-{response['result']['totalCost']} Tickets {cost_class_2emote('ticket')}**')
+    # skip crate deals
+    for i in range(1, 3):
+        projection = response['result']['projections'][i]
+        deals = projection['deals']
 
+        for deal in deals:
+            if deal['className'] == 'ticketShard':
+                if deal['costPerUnit'] <= shard_ratio_threshold:
+                    spent_shard_sum += deal['cost']
+                    gained_ticket_shard_sum += deal['amount']
+
+            elif deal['className'] == 'ticket' and buy_ticket_to_ticket:
+                spent_ticket_sum += deal['cost']
+                gained_ticket_to_ticket_sum += deal['amount']
+
+    embed.add_field(name=f"Day period: {days} days\nMaximum Shard Ratio: {shard_ratio_threshold:.2f}\n"
+                         f"Buying all Ticket to Ticket Deals: {'Yes' if buy_ticket_to_ticket else 'No'}", value='', inline=False)
+
+    formatted_void_shards = (f"+{gained_ticket_shard_sum} Void Tickets {class2emote('ticketShard')}\n"
+                             f"-{spent_shard_sum} Void Shards {cost_type2emote('ticketShard')}")
+    embed.add_field(name=f"Type: {class2emote('ticketShard')} {cost_type2emote('ticketShard')}", value=formatted_void_shards, inline=False)
+
+    if buy_ticket_to_ticket:
+        formatted_tickets = (f"+{gained_ticket_to_ticket_sum} Void Tickets {class2emote('ticketShard')}\n"
+                                 f"-{spent_ticket_sum} Tickets {cost_type2emote('ticket')}")
+        embed.add_field(name=f"Type: {class2emote('ticketShard')} {cost_type2emote('ticket')}",
+                        value=formatted_tickets, inline=False)
+
+    embed.add_field(name=f"~~                                                                              ~~\n"
+                         f"__Total Void Tickets Gained: **{gained_ticket_to_ticket_sum + gained_ticket_shard_sum}**__ {class2emote('ticketShard')} ",
+                    value='', inline=False)
 
     return embed
 
@@ -318,13 +406,14 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
 
     @app_commands.command(name="today", description="Sends today's void deals")
     async def void_deals_today(self, interaction: discord.Interaction, invisible: bool = True):
-        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
             await interaction.response.defer(ephemeral=True)
         else:
             await interaction.response.defer()
 
         embed, file = build_embed_today_deals()
-
 
         await interaction.followup.send(embed=embed, file=file)
 
@@ -338,7 +427,9 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
     @app_commands.describe(maximum_price_per_unit="Crate cost range: 150-190, Ticket to Ticket cost range: 200-300, Ticket to Shard cost range: 150-200")
     async def void_deals_next_hit(self, interaction: discord.Interaction, deal_type: discord.app_commands.Choice[str],
                                   maximum_price_per_unit: int, invisible: bool = True):
-        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
             await interaction.response.defer(ephemeral=True)
         else:
             await interaction.response.defer()
@@ -349,43 +440,25 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
 
     @app_commands.command(name="projection", description="Sends the amount of Void Tickets you can get in a timeframe. Shards not supported")
     @app_commands.describe(day_period="The amount of days to sum up deals for. Value range is 1-365 days.")
-    async def void_deals_projection(self, interaction: discord.Interaction, day_period: int, invisible: bool = True):
-        if invisible is True or interaction.channel.name not in ["bot", "bot-commands"]:
+    async def void_deals_projection(self, interaction: discord.Interaction, day_period: int, max_shard_ratio: float,
+                                    buy_ticket_to_ticket: bool, invisible: bool = True):
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
             await interaction.response.defer(ephemeral=True)
         else:
             await interaction.response.defer()
 
-        embed = build_embed_projection_deals(day_period)
+        embed = build_embed_projection_deals(day_period, max_shard_ratio, buy_ticket_to_ticket)
 
         await interaction.followup.send(embed=embed)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(VoidDeals(bot))
 
-# days = 30
-# buy_ticket_to_ticket = True
-#
-# spent_shard_sum = 0
-# spent_ticket_sum = 0
-# gained_ticket_sum = 0
-#
-# shard_ratio_threshold = 160
-# start_date = datetime.now() + timedelta(days=1)
-#
-# for i in range(1, days + 1):
-#     response = get_void_deals(start_date)
-#     slots = response['result']['slots']
-#
-#     for slot in slots:
-#         if slot['className'] == 'ticketShard':
-#             if slot['costPerUnit'] <= shard_ratio_threshold:
-#                 spent_shard_sum += slot['cost']
-#                 gained_ticket_sum += slot['amount']
-#
-#         elif slot['className'] == 'ticket' and buy_ticket_to_ticket:
-#             spent_ticket_sum += slot['cost']
-#             gained_ticket_sum += slot['amount']
-#
-#     start_date += timedelta(days=1)
+
 #
 # print(gained_ticket_sum, spent_shard_sum, spent_ticket_sum)
+
+# print(get_void_deals_next_hit(datetime.now(), 'crate', 150))
+# print(get_void_deals_next_x_raw(datetime.now(), 10))
