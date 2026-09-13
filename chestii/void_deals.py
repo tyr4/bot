@@ -14,21 +14,26 @@ STATE_FILE = "void_deals_state.json"
 
 def load_state() -> dict:
     if not os.path.exists(STATE_FILE):
-        return {"last_reset": None, "sent": False}
+        return {"last_reset": None, "sent_embed": False, "updated_pin": False}
 
     with open(STATE_FILE) as f:
         try:
             loaded = json.load(f)
         except json.JSONDecodeError:
-            return {"last_reset": None, "sent": False}
+            return {"last_reset": None, "sent_embed": False, "updated_pin": False}
 
     return {
         "last_reset": loaded.get("last_reset"),
-        "sent": loaded.get("sent", False)
+        "sent_embed": loaded.get("sent_embed", False),
+        "updated_pin": loaded.get("updated_pin", False)
     }
 
+loaded_state = load_state()
+
 def save_state(state: dict) -> None:
+    global loaded_state
     temp_path = f"{STATE_FILE}.tmp"
+    loaded_state = state
 
     with open(temp_path, "w") as f:
         json.dump(state, f, indent=4)
@@ -37,7 +42,7 @@ def save_state(state: dict) -> None:
 
 def should_send_deals_today() -> bool:
     current_reset = get_last_reset_time()
-    state = load_state()
+    state = loaded_state
 
     stored_reset = (
         datetime.fromisoformat(state["last_reset"])
@@ -46,13 +51,35 @@ def should_send_deals_today() -> bool:
 
     # a new reset window has started since we last checked -> flag resets itself
     if stored_reset != current_reset:
-        state = {"last_reset": current_reset.isoformat(), "sent": False}
+        state = {"last_reset": current_reset.isoformat(), "sent_embed": False, "updated_pin": False}
 
-    if state["sent"]:
+    if state["sent_embed"]:
         save_state(state)
         return False
 
-    state["sent"] = True
+    state["sent_embed"] = True
+    save_state(state)
+
+    return True
+
+def should_update_pin_today() -> bool:
+    current_reset = get_last_reset_time()
+    state = loaded_state
+
+    stored_reset = (
+        datetime.fromisoformat(state["last_reset"])
+        if state["last_reset"] else None
+    )
+
+    # a new reset window has started since we last checked -> flag resets itself
+    if stored_reset != current_reset:
+        state = {"last_reset": current_reset.isoformat(), "sent_embed": False, "updated_pin": False}
+
+    if state["updated_pin"]:
+        save_state(state)
+        return False
+
+    state["updated_pin"] = True
     save_state(state)
 
     return True
@@ -261,8 +288,12 @@ def get_next_deals_timestamp(date: datetime):
     else:
         return (reset_today + timedelta(days=1)).timestamp()
 
-def string2timestamp(formatted_date: str):
+def string2timestamp(formatted_date: str) -> float:
     return datetime.strptime(formatted_date, "%Y-%m-%d").replace(tzinfo=timezone.utc, hour=12).timestamp()
+
+def string2date(formatted_date: str) -> datetime:
+    # matches the same deal date
+    return datetime.strptime(formatted_date, "%Y-%m-%d").replace(tzinfo=timezone.utc, hour=11)
 
 def build_embed_slot_field(embed, slot_count, slot: dict):
     slot_class = slot["className"]
@@ -285,7 +316,7 @@ def build_void_deals_ping():
 
     return message
 
-def build_all_embed_slots(embed, slots: list, date: datetime, override_with_today_deals_date: bool = False):
+def build_all_embed_slots(embed, date: datetime, override_with_today_deals_date: bool = False):
     timestamp = get_next_deals_timestamp(date - timedelta(days=1)) if override_with_today_deals_date \
                 else get_next_deals_timestamp(date)
 
@@ -308,7 +339,7 @@ def build_embed_today_deals():
     embed = get_void_deals_basic_embed()
     slots = response['result']['slots']
 
-    file = build_all_embed_slots(embed, slots, get_last_reset_time())
+    file = build_all_embed_slots(embed, get_last_reset_time())
 
     return embed, file
 
@@ -345,7 +376,7 @@ def build_embed_next_hit_deals(class_name, max_cost_per_unit):
     full_deals = get_void_deals(date)
     slots = [slot for slot in full_deals['result']['slots']]
 
-    file = build_all_embed_slots(embed, slots, date, override_with_today_deals_date=True)
+    file = build_all_embed_slots(embed, date, override_with_today_deals_date=True)
 
     return embed, file
 
@@ -399,12 +430,37 @@ def build_embed_projection_deals(days, shard_ratio_threshold, buy_ticket_to_tick
 
     return embed
 
+class MoveButtons(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.current_date = datetime.now()
+
+    @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple, custom_id="previous_button")
+    async def previous_deal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+
+        self.current_date -= timedelta(days=1)
+        embed = get_void_deals_basic_embed()
+        file = build_all_embed_slots(embed, self.current_date)
+
+        await interaction.edit_original_response(view=self, embed=embed, attachments=[file])
+
+    @discord.ui.button(label="➡️️", style=discord.ButtonStyle.blurple, custom_id="next_button")
+    async def next_deal_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+
+        self.current_date += timedelta(days=1)
+        embed = get_void_deals_basic_embed()
+        file = build_all_embed_slots(embed, self.current_date)
+
+        await interaction.edit_original_response(view=self, embed=embed, attachments=[file])
+
 class VoidDeals(commands.GroupCog, name="void_deals"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         super().__init__()
 
-    @app_commands.command(name="today", description="Sends today's void deals")
+    @app_commands.command(name="preview", description="Sends a preview of today's void deals and allows you to cycle through them")
     async def void_deals_today(self, interaction: discord.Interaction, invisible: bool = True):
         if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
             await interaction.response.defer()
@@ -415,7 +471,7 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
 
         embed, file = build_embed_today_deals()
 
-        await interaction.followup.send(embed=embed, file=file)
+        await interaction.followup.send(embed=embed, file=file, view=MoveButtons())
 
     @app_commands.command(name="next_hit", description="Sends the deals for the day that matches your specified criteria")
     @app_commands.choices(deal_type=[
@@ -452,6 +508,29 @@ class VoidDeals(commands.GroupCog, name="void_deals"):
         embed = build_embed_projection_deals(day_period, max_shard_ratio, buy_ticket_to_ticket)
 
         await interaction.followup.send(embed=embed)
+
+    @app_commands.command(name="fixed_date", description="Sends the Void Deals on a specific date.")
+    @app_commands.describe(date="MUST FOLLOW THE FORMAT: YYYY-MM-DD")
+    async def void_deals_fixed_date(self, interaction: discord.Interaction, date: str, invisible: bool = True):
+        if interaction.channel.name in ["bot", "amogus-testing", "bot-commands"]:
+            await interaction.response.defer()
+        elif invisible is True:
+            await interaction.response.defer(ephemeral=True)
+        else:
+            await interaction.response.defer()
+
+        embed = get_void_deals_basic_embed()
+
+        try:
+            formatted_date = string2date(date)
+        except Exception as e:
+            embed.add_field(name="That is not a valid date.", value='', inline=False)
+            await interaction.followup.send(embed=embed)
+            return
+
+        file = build_all_embed_slots(embed, formatted_date)
+
+        await interaction.followup.send(embed=embed, file=file)
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(VoidDeals(bot))

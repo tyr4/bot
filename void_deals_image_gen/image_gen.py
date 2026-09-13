@@ -429,7 +429,7 @@ def generate_image(date: datetime):
         response = get_void_deals()
         shop_date = get_last_reset_time().date()
 
-    output = (base_dir / "generated images" / f"daily_deals_{shop_date:%Y-%m-%d}.png")
+    output = (base_dir / "generated images" / f"daily_deals.png")
 
     deals = render_shop_from_api(response, shop_date, template, assets_dir, font, output)
 

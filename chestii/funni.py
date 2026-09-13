@@ -11,7 +11,7 @@ import json
 
 from chestii.wrapped import update_wrapped_data
 from chestii.void_deals import build_embed_today_deals, should_send_deals_today, build_void_deals_ping, \
-    build_embed_pinned_message
+    build_embed_pinned_message, should_update_pin_today
 
 log_ok = 0
 kuru_lock = asyncio.Lock()
@@ -282,7 +282,7 @@ class Funni(commands.Cog):
         #         await message.delete()
         #         await asyncio.sleep(1)
 
-    @tasks.loop(seconds=60)
+    @tasks.loop(seconds=1)
     async def check_void_deals_daily(self):
         global void_plus_channel
 
@@ -297,8 +297,9 @@ class Funni(commands.Cog):
         global void_plus_channel
         global void_plus_message
 
-        embed, file = build_embed_pinned_message()
-        await void_plus_message.edit(embed=embed, attachments=[file])
+        if should_update_pin_today():
+            embed, file = build_embed_pinned_message()
+            await void_plus_message.edit(embed=embed, attachments=[file])
 
     @check_void_deals_embed.before_loop
     @check_void_deals_daily.before_loop
@@ -554,7 +555,7 @@ class Funni(commands.Cog):
                     kurukuru2 = randint(1, 5)
                     if kurukuru2 == 5 or str(message.channel) == "amogus-testing":
                         await message.add_reaction("<a:kurukuru2:1139252590278889529>")
-                        update(str(message.author.id), str(message.author), 2)
+                        await update(str(message.author.id), str(message.author), 2)
 
                 if message.channel.id not in [696035168414072913, 1069249122428780636, 1367130635801722972]:
                     if kurukuru_jackpo == 100000:
