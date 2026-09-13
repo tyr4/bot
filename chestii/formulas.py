@@ -11,16 +11,8 @@ from math import log, pow
 from timeit import default_timer as timer
 
 from chestii.wrapped import update_wrapped_data
+from utils.mob_formula import get_mob, get_mob_range, get_mob_range_with_days
 
-with open("ceva.csv") as csv_file:
-    csv_reader = csv.reader(csv_file)
-    lista_csv = list(csv_reader)
-
-with open("mobData.csv") as csv_file:
-    csv_reader = csv.reader(csv_file)
-    mob_data_csv = list(csv_reader)
-
-max_day = int(lista_csv[-1][0])
 double_rewind = False
 
 matrice_babana = \
@@ -113,14 +105,17 @@ mob_data_dict = \
     }
 print("EXIST")
 
+all_mobs = get_mob_range(1, 100000)
+
 def mob_data(initial: int, how_many: int, filter_by: int):
     how_many = min(200, how_many)
-    max_day = int(mob_data_csv[0][0])
+    nearest_day = 0
+
     embed = discord.Embed(title="Days Mob Data <a:kafkakurukuru:1118233531110412461>", color=0x71368a)
     embed.set_footer(text="If you spot any issues with this bot, please ping '@_tyrael.'",
                      icon_url="https://cdn.discordapp.com/emojis/1139252590278889529.gif")
     # raw range
-    result_list = mob_data_csv[max_day - initial : max_day - initial - how_many : -1]
+    result_list = get_mob_range_with_days(initial, how_many)
     print(result_list)
 
     # apply filter
@@ -138,15 +133,17 @@ def mob_data(initial: int, how_many: int, filter_by: int):
     embed.add_field(name=f"", value="", inline=False)
 
     output_string = "```"
-    for day in result_list:
+    for pair in result_list:
+        day = pair[0]
+        mob = pair[1]
         next_string = ""
 
         # normal output
-        next_string += f"Day {day[0]} (+{int(day[0]) - initial}): {day[1]}"
+        next_string += f"Day {day} (+{day - initial}): {mob}"
 
         # boss day
-        if int(day[0]) % 5 == 0:
-            next_string += f" ({boss[int(day[0][-2:]) // 5]})".title()
+        if day % 5 == 0:
+            next_string += f" ({boss[int(str(day)[-2:]) // 5]})".title()
 
         next_string += "\n"
 
@@ -163,7 +160,7 @@ def mob_data(initial: int, how_many: int, filter_by: int):
     if filter_by != 0:
         embed.set_field_at(1,
                            name=f"",
-                           value=f"\n**Nearest Day with a {result_list[0][1]}: __{result_list[0][0]} (+{int(result_list[0][0]) - initial})__**"
+                           value=f"\n**Nearest Day with a {result_list[0][1]}: __{result_list[0][1]} (+{int(result_list[0][0]) - initial})__**"
                                  f"\n**Next {"Awaken" if initial < 10220 else "Apple"}: {(math.floor(initial / 365) + 1) * 365}**",
                            inline=False)
     
@@ -338,11 +335,6 @@ def spot_range(day: int, tj: bool, express: bool, mode: int, double_rewind: bool
 
 
 def portal_compare(spot1: int, spot2: int, tj: bool, express: bool, double_rewind: bool):
-    # mobs = ["dino", "rex", "shade", "frosk", "blob", "gargoyle", "caps", "warmonger", "banshee"]
-    # with open("ceva.csv") as csv_file:
-    #     csv_reader = csv.reader(csv_file)
-    #     lista_csv = list(csv_reader)
-
     if express:
         portal1 = 10 if spot1 // 500 == 0 else (spot1 // 500) * 10
         portal2 = 10 if spot2 // 500 == 0 else (spot2 // 500) * 10
@@ -984,10 +976,6 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
         start = spot_range(start + 1, tj, express, 2, double_rewind)
         spots.append(start)
 
-    with open("ceva.csv") as csv_file:
-        csv_reader = csv.reader(csv_file)
-        lista_csv = list(csv_reader)
-
         for day in spots:
             lista = spot_score(day=day, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=mode)
             alta_matrice_babana.append(lista)
@@ -1037,56 +1025,54 @@ def best_spot(daya: int, day_range: int, express: bool, tj: bool, mode: int, tit
 
 
 def detailed_spot(daya: int, express: bool, tj: bool, double_rewind: bool, titor: float):
-    with open("ceva.csv") as csv_file:
-        csv_reader = csv.reader(csv_file)
-        lista_csv = list(csv_reader)
-        embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
-        embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
-                             "------------", value='', inline=False)
-        score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=1)
-        score_fishy = score_fishy_list[1]
-        score_dodo = score_fishy_list[3]
-        if daya > 1000:
-            score_seconds = secunda(spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
-            embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
+    embed = discord.Embed(title="PORTAL --- DAY --- MOB --- BOSS\n--------------------------------", color=0x71368a)
+    embed.add_field(name="Rewind Spot Calculator <a:kafkakurukuru:1118233531110412461>\n------------------------"
+                         "------------", value='', inline=False)
+    score_fishy_list = spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=1)
+    score_fishy = score_fishy_list[1]
+    score_dodo = score_fishy_list[3]
+
+    if daya > 1000:
+        score_seconds = secunda(spot_score(day=daya, titor=titor, express=express, tj=tj, double_rewind=double_rewind, mode=2)[1])
+        embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}) or {score_seconds} minutes, with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
+    else:
+        embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
+    if express:
+        portal = 10 if daya // 500 == 0 else (daya // 500) * 10
+    else:
+        portal = 5 if daya // 500 == 0 else (daya // 500) * 5
+    portal_count = 1
+    initial = daya
+    if tj:
+        if double_rewind:
+            daya = int(spot_round(spot_round(daya * 0.75) * 0.75))
         else:
-            embed.add_field(name=f"This spot has a score of {score_fishy} ({score_dodo}), with a {score_fishy_list[4]} Day last portal.", value='', inline=False)
-        if express:
-            portal = 10 if daya // 500 == 0 else (daya // 500) * 10
+            daya = int(spot_round(daya * 0.75))
+    else:
+        if double_rewind:
+            daya = int(spot_round(spot_round(daya * 0.5) * 0.5))
         else:
-            portal = 5 if daya // 500 == 0 else (daya // 500) * 5
-        portal_count = 1
-        initial = daya
-        if tj:
-            if double_rewind:
-                daya = int(spot_round(spot_round(daya * 0.75) * 0.75))
-            else:
-                daya = int(spot_round(daya * 0.75))
+            daya = int(spot_round(daya * 0.5))
+    i = 0
+    if daya % 5 != 0:
+        return 0
+    ceva = "```\n"
+    while daya < initial:
+        if i < 9:
+            ceva += f"{portal_count}:  " f"{daya} " + f"M. {all_mobs[(daya // 5) - 1]}" + f" B. " \
+                                                                                              f"{boss[daya % 100 // 5].title()}\n"
         else:
-            if double_rewind:
-                daya = int(spot_round(spot_round(daya * 0.5) * 0.5))
-            else:
-                daya = int(spot_round(daya * 0.5))
-        i = 0
-        if daya % 5 != 0:
-            return 0
-        ceva = "```\n"
-        while daya < initial:
-            if i < 9:
-                ceva += f"{portal_count}:  " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                  f"{boss[daya % 100 // 5].title()}\n"
-            else:
-                ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                                                                                                 f"{boss[daya % 100 // 5].title()}\n"
-            if i % 14 == 0 and i >= 14:
-                ceva += "\n```"
-                embed.add_field(name='', value=ceva, inline=False)
-                ceva = "```\n"
-                # ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
-                #                                                                                  f"{boss[daya % 100 // 5].title()}\n"
-            daya += portal
-            portal_count += 1
-            i += 1
+            ceva += f"{portal_count}: " f"{daya} " + f"M. {all_mobs[(daya // 5) - 1]}" + f" B. " \
+                                                                                             f"{boss[daya % 100 // 5].title()}\n"
+        if i % 14 == 0 and i >= 14:
+            ceva += "\n```"
+            embed.add_field(name='', value=ceva, inline=False)
+            ceva = "```\n"
+            # ceva += f"{portal_count}: " f"{daya} " + f"M. {lista_csv[(daya // 5) - 1][1]}" + f" B. " \
+            #                                                                                  f"{boss[daya % 100 // 5].title()}\n"
+        daya += portal
+        portal_count += 1
+        i += 1
 
     ceva += "\n```"
     embed.add_field(name='', value=ceva, inline=False)
@@ -1474,7 +1460,7 @@ class Formulas(commands.GroupCog, name="calc"):
     @app_commands.describe(days_to_look_ahead="Days you want to look ahead the starting day, for all spots within that range")
     async def spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True, tj: bool = True, express: bool = True) -> None:
         print(f"Trying 'Rewind Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel double")
-        if 50 <= days_to_look_ahead and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
+        if 50 <= days_to_look_ahead and starting_day >= 50:
             if double_rewind is True and starting_day < 10585:
                 await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
                 return
@@ -1489,8 +1475,8 @@ class Formulas(commands.GroupCog, name="calc"):
 
         else:
             await interaction.response.send_message(
-                "Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
+                "Invalid data, please try again.\n- Max 500 spots a time."
+                "\n- Days to look ahead must "
                 "be greater than 50.\n- Starting day must be above 50.\nSecond approximations not available below Day 1000."
                 , ephemeral=True)
         print("Done w/ Rewind Spots")
@@ -1533,7 +1519,7 @@ class Formulas(commands.GroupCog, name="calc"):
     async def best_spots_f(self, interaction: discord.Interaction, starting_day: int, days_to_look_ahead: int, invisible: bool = True,
                            tj: bool = True, express: bool = True) -> None:
         print(f"Trying 'Best Spots' with the following data: Starting Day: {starting_day}, Days to look ahead: {days_to_look_ahead} titel")
-        if 100 <= days_to_look_ahead and (starting_day + days_to_look_ahead) <= max_day and starting_day >= 50:
+        if 100 <= days_to_look_ahead and starting_day >= 50:
             if double_rewind is True and starting_day < 10585:
                 await interaction.response.send_message('Day 10585+ required to use the Doubles option', ephemeral=True)
                 return
@@ -1546,8 +1532,8 @@ class Formulas(commands.GroupCog, name="calc"):
                 else:
                     await interaction.response.send_message(embed=embed)
         else:
-            await interaction.response.send_message("Invalid data, please try again.\n- Max 500 spots a time.\n- Currently, "
-                                                    f"the mob data goes up to Day {max_day}.\n- Days to look ahead must "
+            await interaction.response.send_message("Invalid data, please try again.\n- Max 500 spots a time.\n"
+                                                    "- Days to look ahead must "
                                                     "be greater than 100.\n- Starting day must be above 50.\nSecond approximations "
                                                     "not available below Day 1000.", ephemeral=True)
         print("Done w/ Best Spots")
